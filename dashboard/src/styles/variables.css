@@ -1,0 +1,83 @@
+:root {
+  /* Brand */
+  --bb-navy: #1e2a3f;
+  --bb-navy-light: #2c3b56;
+  --bb-blue: #2f8fe0;
+  --bb-blue-dark: #1c6fc2;
+  --bb-blue-bg: #eaf4fd;
+  --bb-yellow: #f0b942;
+  --bb-yellow-bg: #fdf3dc;
+  --bb-green: #2f9e56;
+  --bb-green-bg: #e3f6e9;
+  --bb-red: #d1483f;
+  --bb-red-bg: #fbe7e5;
+  --bb-orange: #e4874a;
+  --bb-orange-bg: #fdece0;
+  --bb-purple: #7c5cd6;
+  --bb-grey: #8993a4;
+
+  /* Text */
+  --text-primary: #17202e;
+  --text-secondary: #5b6472;
+  --text-muted: #8993a4;
+  --text-inverse: #ffffff;
+
+  /* Backgrounds */
+  --bg-page: #f4f6f9;
+  --bg-card: #ffffff;
+  --bg-subtle: #f8f9fb;
+  --bg-nav: var(--bb-navy);
+
+  /* Borders */
+  --border-color: #e3e7ee;
+  --border-color-strong: #cfd6e0;
+
+  /* Risk scale */
+  --risk-low: #a9d18e;
+  --risk-medium: #f0c766;
+  --risk-med-high: #ef9b6f;
+  --risk-high: #d1483f;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px rgba(23, 32, 46, 0.06);
+  --shadow-md: 0 4px 16px rgba(23, 32, 46, 0.08);
+  --shadow-lg: 0 12px 32px rgba(23, 32, 46, 0.14);
+
+  /* Layout */
+  --page-max-width: 1180px;
+  --header-height: 64px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #eef1f6;
+    --text-secondary: #b7c0cd;
+    --text-muted: #8993a4;
+    --bg-page: #11151d;
+    --bg-card: #1a202c;
+    --bg-subtle: #202836;
+    --border-color: #2b3345;
+    --border-color-strong: #39435a;
+    --bb-blue-bg: #16283d;
+    --bb-yellow-bg: #3a301a;
+    --bb-green-bg: #16311f;
+    --bb-red-bg: #3a1f1c;
+    --bb-orange-bg: #3a2717;
+  }
+}

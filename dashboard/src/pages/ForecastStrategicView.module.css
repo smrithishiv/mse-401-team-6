@@ -1,0 +1,41 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.cardsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.chartCard,
+.breakdownCard {
+  padding: var(--space-5);
+}
+
+.chartTitle {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: var(--space-3);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.panelHeader a {
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}

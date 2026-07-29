@@ -1,0 +1,111 @@
+.heroCard {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.heroLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.heroRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.heroValue {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.heroSubtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.recommendation {
+  margin-top: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.recommendation strong {
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.recommendation p {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 640px;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.cardIcon {
+  color: var(--bb-blue);
+}
+
+.updated {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.panel {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panelHeader h2 {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.panelHeader a {
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.signalList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (max-width: 860px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+}

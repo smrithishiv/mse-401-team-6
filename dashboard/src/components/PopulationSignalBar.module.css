@@ -1,0 +1,60 @@
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+}
+
+.label {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.change {
+  font-weight: 700;
+}
+
+.track {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+}
+
+.low.fill,
+.low.change {
+  background: var(--bb-yellow);
+}
+.low.change {
+  background: none;
+  color: #9a6c0f;
+}
+
+.medium.fill,
+.medium.change {
+  background: var(--bb-orange);
+}
+.medium.change {
+  background: none;
+  color: #a35322;
+}
+
+.high.fill,
+.high.change {
+  background: var(--bb-red);
+}
+.high.change {
+  background: none;
+  color: var(--bb-red);
+}

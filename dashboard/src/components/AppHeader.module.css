@@ -1,0 +1,171 @@
+.header {
+  background: var(--bg-nav);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.inner {
+  max-width: var(--page-max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-inverse);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.logoMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  background: var(--bb-yellow);
+  color: var(--bb-navy);
+  flex-shrink: 0;
+}
+
+.brandName {
+  text-transform: uppercase;
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-2);
+  flex: 1;
+  overflow-x: auto;
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navLink:hover {
+  color: var(--text-inverse);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.navLinkActive {
+  background: var(--bb-blue);
+  color: var(--text-inverse);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.menuWrap {
+  position: relative;
+}
+
+.iconButton,
+.filterButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-inverse);
+}
+
+.iconButton:hover,
+.filterButton:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.filterButton {
+  position: relative;
+  background: var(--text-inverse);
+  color: var(--bb-navy);
+  border-color: transparent;
+}
+
+.filterButton:hover {
+  background: #eef1f6;
+}
+
+.filterBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--bb-red);
+  color: var(--text-inverse);
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+}
+
+.dropdown a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 14px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.dropdown a:hover {
+  background: var(--bg-subtle);
+}
+
+@media (max-width: 720px) {
+  .brandName {
+    display: none;
+  }
+  .nav {
+    gap: 0;
+  }
+  .navLink {
+    padding: var(--space-2);
+    font-size: 13px;
+  }
+}

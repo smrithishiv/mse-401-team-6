@@ -1,0 +1,20 @@
+.bar {
+  fill: var(--bb-blue);
+  opacity: 0.45;
+}
+
+.bar.last {
+  opacity: 1;
+}
+
+.red.bar {
+  fill: var(--bb-red);
+}
+
+.yellow.bar {
+  fill: var(--bb-yellow);
+}
+
+.blue.bar {
+  fill: var(--bb-blue);
+}

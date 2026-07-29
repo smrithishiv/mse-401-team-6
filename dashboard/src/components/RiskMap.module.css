@@ -1,0 +1,114 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mapArea {
+  position: relative;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+}
+
+.region {
+  stroke: var(--bg-card);
+  stroke-width: 3;
+  cursor: pointer;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.region:hover,
+.regionHovered {
+  opacity: 0.85;
+  filter: brightness(0.95);
+}
+
+.region:focus-visible {
+  outline: 3px solid var(--bb-blue);
+  outline-offset: -2px;
+}
+
+.risk-low {
+  fill: var(--risk-low);
+}
+
+.risk-medium {
+  fill: var(--risk-medium);
+}
+
+.risk-med-high {
+  fill: var(--risk-med-high);
+}
+
+.risk-high {
+  fill: var(--risk-high);
+}
+
+.regionLabel {
+  font-size: 13px;
+  font-weight: 700;
+  fill: #1c2433;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.regionSubLabel {
+  font-size: 10px;
+  fill: #3a4353;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.compassLabel {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--text-secondary);
+  text-anchor: middle;
+}
+
+.compassArrow {
+  stroke: var(--text-secondary);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.tooltipCard {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-3);
+  font-size: 13px;
+  color: var(--text-primary);
+  pointer-events: none;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legendSwatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-block;
+}
