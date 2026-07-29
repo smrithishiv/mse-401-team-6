@@ -62,8 +62,12 @@ src/
 - `/overview` — headline demand number, active agencies, allocation alerts,
   population signals, agencies needing review
 - `/forecast` — Operational (July–Sept monthly cards + chart) and Strategic
-  (5-year chart + demographic breakdown) views, toggled with a segmented
-  control
+  (5-year chart + the "Demand drivers — 5-year outlook" panel: Age
+  Group/Income/Gender tabs, a % vs. population toggle, a stacked-area or
+  multi-line trend chart depending on viewport width, a "Largest projected
+  shifts" panel, and a 2031 composition summary — see
+  [Demand drivers panel](#demand-drivers-panel) below) views, toggled with a
+  segmented control
 - `/at-risk-groups` — risk metrics, a simplified Waterloo Region risk map,
   socioeconomic signal cards, population signal bars
 
@@ -114,6 +118,36 @@ Set the real backend's URL in `.env`:
 ```
 VITE_API_BASE_URL=https://your-backend.example.com
 ```
+
+## Demand drivers panel
+
+The Strategic Forecast view's "Demand drivers — 5-year outlook" panel
+(`src/components/DemandDriversPanel.jsx`) shows how each demographic mix is
+expected to change from 2026–2031, not just a single-year snapshot. It's
+built from `strategicForecast.demandDrivers` in `mockForecastData.js` —
+retrieved through `getStrategicForecast()` in `forecastService.js` like the
+rest of the strategic view, not a separate fetch.
+
+**Every dimension (`ageGroup`, `income`, `gender`) carries a `dataType`**:
+`model_forecast`, `planning_scenario`, or `current_proportions` (see
+`src/utils/demandDataType.js` for the label/description shown in the UI, and
+the `DemandDataType` typedef in `src/utils/types.js`). This is deliberate —
+the mock data mixes all three so the UI is forced to distinguish them:
+Age Group is a real projection, Income is a policy-assumption scenario (the
+living-wage gap persisting), and Gender is just today's split held flat
+(no gender-forecasting model exists). **Never render a `planning_scenario`
+or `current_proportions` series without its badge** — that's what stops a
+planning assumption from being read as a model-generated forecast. When
+wiring a real backend, keep sending this field for every dimension.
+
+Chart type (`src/components/DemandDriversChart.jsx`) is chosen by viewport,
+not by the percentage/population toggle: a stacked area chart above 720px
+(clearest way to show parts of a whole), a multi-line chart at or below it
+(a compressed stacked area gets hard to read), via `useMediaQuery`
+(`src/hooks/useMediaQuery.js`). The legend is plain accessible HTML buttons
+(`aria-pressed`) rather than Recharts' built-in legend, so series
+selection is keyboard-operable; toggling a button sets that series' `hide`
+prop rather than removing it from the chart, so the stack/axes don't jump.
 
 ## Filter architecture
 
@@ -189,6 +223,12 @@ a client-side stand-in for a future server-generated report endpoint.
   snapshots, agency selector filters the table (`src/pages/OverviewPage.test.jsx`)
 - `usePageFilters` draft/apply/reset semantics and that two page instances
   never share state (`src/hooks/usePageFilters.test.jsx`)
+- Demand drivers panel — tab/data-type labels switch correctly (model
+  forecast vs. planning scenario vs. current proportions), the display-mode
+  toggle changes shift units, legend buttons toggle series visibility
+  (`src/components/DemandDriversPanel.test.jsx`)
+- Demand drivers data reshaping/sorting/formatting
+  (`src/utils/demandDrivers.test.js`)
 - Loading and error states, including retry (`src/hooks/useAsync.test.js`)
 - Forecast values rendered from the service layer
   (`src/services/forecastService.test.js`)

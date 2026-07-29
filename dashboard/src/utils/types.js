@@ -103,4 +103,40 @@
  * @property {string} income - 'all' | 'under20k' | '20-40k' | '40-60k' | '60k+'
  */
 
+/**
+ * @typedef {'model_forecast' | 'planning_scenario' | 'current_proportions'} DemandDataType
+ * Every DemandDriversDimension must carry one of these so the UI can label
+ * whether a segment's 5-year trend is real model output, a policy/planning
+ * assumption, or just today's split held flat. Never render a
+ * `planning_scenario` or `current_proportions` series as if it were a
+ * `model_forecast`.
+ */
+
+/**
+ * @typedef {Object} DemandDriverPoint
+ * @property {number} year
+ * @property {number} pct - this segment's share of total demand that year (0-100)
+ * @property {number} people - forecasted population for this segment that year
+ */
+
+/**
+ * @typedef {Object} DemandDriverSegment
+ * @property {string} id
+ * @property {string} label
+ * @property {string} color
+ * @property {DemandDriverPoint[]} points - one entry per year in DemandDriversDimension.years
+ */
+
+/**
+ * @typedef {Object} DemandDriversDimension
+ * @property {DemandDataType} dataType
+ * @property {DemandDriverSegment[]} segments
+ */
+
+/**
+ * @typedef {Object} DemandDriversResponse
+ * @property {number[]} years
+ * @property {{ ageGroup: DemandDriversDimension, income: DemandDriversDimension, gender: DemandDriversDimension }} dimensions
+ */
+
 export {};

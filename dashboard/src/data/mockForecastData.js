@@ -86,23 +86,182 @@ export const strategicForecast = {
       { label: '2031', value: 618000, low: 555000, high: 681000 },
     ],
   },
-  demandBreakdown: {
-    gender: [
-      { label: 'M', pct: 52, color: 'var(--bb-blue)' },
-      { label: 'F', pct: 40, color: 'var(--bb-red)' },
-      { label: 'Other', pct: 8, color: 'var(--bb-grey)' },
-    ],
-    ageGroup: [
-      { label: '<18', pct: 34, color: 'var(--bb-purple)' },
-      { label: '18-44', pct: 28, color: 'var(--bb-blue)' },
-      { label: '45-64', pct: 24, color: 'var(--bb-green)' },
-      { label: '65+', pct: 14, color: 'var(--bb-yellow)' },
-    ],
-    income: [
-      { label: '<$20k', pct: 29, color: 'var(--bb-red)' },
-      { label: '$20-40k', pct: 35, color: 'var(--bb-green)' },
-      { label: '$40-60k', pct: 22, color: 'var(--bb-purple)' },
-      { label: '$60k+', pct: 14, color: 'var(--bb-grey)' },
-    ],
+  // Powers the "Demand drivers — 5-year outlook" panel. `years` matches
+  // chart.forecast above (2026 = the connecting/base year through 2031).
+  // Each segment's `points[].people` is that segment's pct share of the
+  // matching year's total from chart.forecast, so segment people sum to
+  // the year's total demand exactly.
+  demandDrivers: {
+    years: [2026, 2027, 2028, 2029, 2030, 2031],
+    dimensions: {
+      ageGroup: {
+        // Real model output: age-group mix projected forward from
+        // historical hamper-visit trends + StatCan age-distribution indicators.
+        dataType: 'model_forecast',
+        segments: [
+          {
+            id: 'under18',
+            label: '<18',
+            color: 'var(--bb-purple)',
+            points: [
+              { year: 2026, pct: 34, people: 159120 },
+              { year: 2027, pct: 33, people: 163350 },
+              { year: 2028, pct: 32, people: 166400 },
+              { year: 2029, pct: 31, people: 171120 },
+              { year: 2030, pct: 30, people: 174900 },
+              { year: 2031, pct: 29, people: 179220 },
+            ],
+          },
+          {
+            id: '18-44',
+            label: '18-44',
+            color: 'var(--bb-blue)',
+            points: [
+              { year: 2026, pct: 28, people: 131040 },
+              { year: 2027, pct: 28, people: 138600 },
+              { year: 2028, pct: 28, people: 145600 },
+              { year: 2029, pct: 29, people: 160080 },
+              { year: 2030, pct: 29, people: 169070 },
+              { year: 2031, pct: 29, people: 179220 },
+            ],
+          },
+          {
+            id: '45-64',
+            label: '45-64',
+            color: 'var(--bb-green)',
+            points: [
+              { year: 2026, pct: 24, people: 112320 },
+              { year: 2027, pct: 24, people: 118800 },
+              { year: 2028, pct: 24, people: 124800 },
+              { year: 2029, pct: 23, people: 126960 },
+              { year: 2030, pct: 23, people: 134090 },
+              { year: 2031, pct: 23, people: 142140 },
+            ],
+          },
+          {
+            id: '65+',
+            label: '65+',
+            color: 'var(--bb-yellow)',
+            points: [
+              { year: 2026, pct: 14, people: 65520 },
+              { year: 2027, pct: 15, people: 74250 },
+              { year: 2028, pct: 16, people: 83200 },
+              { year: 2029, pct: 17, people: 93840 },
+              { year: 2030, pct: 18, people: 104940 },
+              { year: 2031, pct: 19, people: 117420 },
+            ],
+          },
+        ],
+      },
+      income: {
+        // Planning assumption, not a statistical projection: assumes the
+        // current living-wage gap (see At-risk Groups) persists, gradually
+        // shifting more households into the lowest income bracket. Swap for
+        // a model_forecast once income is modelled directly.
+        dataType: 'planning_scenario',
+        segments: [
+          {
+            id: 'under20k',
+            label: '<$20k',
+            color: 'var(--bb-red)',
+            points: [
+              { year: 2026, pct: 29, people: 135720 },
+              { year: 2027, pct: 30, people: 148500 },
+              { year: 2028, pct: 31, people: 161200 },
+              { year: 2029, pct: 32, people: 176640 },
+              { year: 2030, pct: 33, people: 192390 },
+              { year: 2031, pct: 34, people: 210120 },
+            ],
+          },
+          {
+            id: '20-40k',
+            label: '$20-40k',
+            color: 'var(--bb-green)',
+            points: [
+              { year: 2026, pct: 35, people: 163800 },
+              { year: 2027, pct: 35, people: 173250 },
+              { year: 2028, pct: 34, people: 176800 },
+              { year: 2029, pct: 34, people: 187680 },
+              { year: 2030, pct: 33, people: 192390 },
+              { year: 2031, pct: 33, people: 203940 },
+            ],
+          },
+          {
+            id: '40-60k',
+            label: '$40-60k',
+            color: 'var(--bb-purple)',
+            points: [
+              { year: 2026, pct: 22, people: 102960 },
+              { year: 2027, pct: 21, people: 103950 },
+              { year: 2028, pct: 21, people: 109200 },
+              { year: 2029, pct: 20, people: 110400 },
+              { year: 2030, pct: 20, people: 116600 },
+              { year: 2031, pct: 19, people: 117420 },
+            ],
+          },
+          {
+            id: '60k-plus',
+            label: '$60k+',
+            color: 'var(--bb-grey)',
+            points: [
+              { year: 2026, pct: 14, people: 65520 },
+              { year: 2027, pct: 14, people: 69300 },
+              { year: 2028, pct: 14, people: 72800 },
+              { year: 2029, pct: 14, people: 77280 },
+              { year: 2030, pct: 14, people: 81620 },
+              { year: 2031, pct: 14, people: 86520 },
+            ],
+          },
+        ],
+      },
+      gender: {
+        // No gender-specific forecasting model exists yet — today's
+        // measured split is held constant across all five years rather than
+        // projected. Shown with a distinct label so it never reads as a
+        // model-generated forecast.
+        dataType: 'current_proportions',
+        segments: [
+          {
+            id: 'male',
+            label: 'Male',
+            color: 'var(--bb-blue)',
+            points: [
+              { year: 2026, pct: 52, people: 243360 },
+              { year: 2027, pct: 52, people: 257400 },
+              { year: 2028, pct: 52, people: 270400 },
+              { year: 2029, pct: 52, people: 287040 },
+              { year: 2030, pct: 52, people: 303160 },
+              { year: 2031, pct: 52, people: 321360 },
+            ],
+          },
+          {
+            id: 'female',
+            label: 'Female',
+            color: 'var(--bb-red)',
+            points: [
+              { year: 2026, pct: 40, people: 187200 },
+              { year: 2027, pct: 40, people: 198000 },
+              { year: 2028, pct: 40, people: 208000 },
+              { year: 2029, pct: 40, people: 220800 },
+              { year: 2030, pct: 40, people: 233200 },
+              { year: 2031, pct: 40, people: 247200 },
+            ],
+          },
+          {
+            id: 'other',
+            label: 'Other',
+            color: 'var(--bb-grey)',
+            points: [
+              { year: 2026, pct: 8, people: 37440 },
+              { year: 2027, pct: 8, people: 39600 },
+              { year: 2028, pct: 8, people: 41600 },
+              { year: 2029, pct: 8, people: 44160 },
+              { year: 2030, pct: 8, people: 46640 },
+              { year: 2031, pct: 8, people: 49440 },
+            ],
+          },
+        ],
+      },
+    },
   },
 };

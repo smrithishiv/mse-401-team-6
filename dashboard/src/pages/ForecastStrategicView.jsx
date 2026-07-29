@@ -1,7 +1,7 @@
 import MetricCard from '../components/MetricCard';
 import ForecastChart from '../components/ForecastChart';
 import ConfidenceBand from '../components/ConfidenceBand';
-import StackedBreakdownBar from '../components/StackedBreakdownBar';
+import DemandDriversPanel from '../components/DemandDriversPanel';
 import { formatCompactNumber, formatNumber, formatPct, formatDate } from '../utils/format';
 import styles from './ForecastStrategicView.module.css';
 
@@ -31,17 +31,7 @@ export default function ForecastStrategicView({ data }) {
         <ConfidenceBand />
       </section>
 
-      <section className={`card ${styles.breakdownCard}`}>
-        <div className={styles.panelHeader}>
-          <h2 className={styles.chartTitle}>Demand Breakdown</h2>
-          <a href="#view-all-breakdown">View all →</a>
-        </div>
-        <div className={styles.breakdownList}>
-          <StackedBreakdownBar label="Gender" segments={data.demandBreakdown.gender} />
-          <StackedBreakdownBar label="Age Group" segments={data.demandBreakdown.ageGroup} />
-          <StackedBreakdownBar label="Income" segments={data.demandBreakdown.income} />
-        </div>
-      </section>
+      <DemandDriversPanel data={data.demandDrivers} />
     </div>
   );
 }
