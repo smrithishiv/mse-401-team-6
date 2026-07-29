@@ -1,13 +1,15 @@
-import StatusBadge from './StatusBadge';
-import Sparkline from './Sparkline';
+import { Link } from 'react-router-dom';
+import AgencyStatusBadge from './AgencyStatusBadge';
+import FourWeekTrend from './FourWeekTrend';
 import styles from './AgencyAlertsTable.module.css';
 
-const TREND_TONE = { 'High demand': 'red', Watch: 'yellow', Normal: 'blue' };
-
 /**
- * @param {{ agencies: Array, onReview: (agency: object) => void }} props
+ * Focused list of agencies currently flagged for attention (not the full
+ * 61-agency directory — that's the Agencies page). Used on Overview's
+ * "Agencies needing review" panel.
+ * @param {{ agencies: Array }} props
  */
-export default function AgencyAlertsTable({ agencies, onReview }) {
+export default function AgencyAlertsTable({ agencies }) {
   if (!agencies?.length) {
     return <p className={styles.empty}>No agencies currently need review.</p>;
   }
@@ -19,8 +21,10 @@ export default function AgencyAlertsTable({ agencies, onReview }) {
           <tr>
             <th scope="col">Agency</th>
             <th scope="col">Status</th>
+            <th scope="col">Reason flagged</th>
             <th scope="col">4-week trend</th>
-            <th scope="col">Action</th>
+            <th scope="col">Recommended action</th>
+            <th scope="col">Review</th>
           </tr>
         </thead>
         <tbody>
@@ -28,19 +32,17 @@ export default function AgencyAlertsTable({ agencies, onReview }) {
             <tr key={agency.id}>
               <td className={styles.nameCell}>{agency.name}</td>
               <td>
-                <StatusBadge status={agency.status} />
+                <AgencyStatusBadge status={agency.status} />
               </td>
+              <td className={styles.reasonCell}>{agency.reasonFlagged || '—'}</td>
               <td>
-                <Sparkline values={agency.trend} tone={TREND_TONE[agency.status] || 'blue'} />
+                <FourWeekTrend values={agency.weeklyDemand} trend={agency.trend} />
               </td>
+              <td className={styles.reasonCell}>{agency.recommendedAction}</td>
               <td>
-                <button
-                  type="button"
-                  className={styles.reviewButton}
-                  onClick={() => onReview?.(agency)}
-                >
+                <Link to={`/agencies/${agency.id}`} className={styles.reviewButton}>
                   Review →
-                </button>
+                </Link>
               </td>
             </tr>
           ))}

@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { ChevronDown, Filter, Wheat } from 'lucide-react';
 import { useState } from 'react';
 import { useFilterUI } from '../context/FilterUIContext';
@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { to: '/overview', label: 'Overview' },
   { to: '/forecast', label: 'Forecast' },
   { to: '/at-risk-groups', label: 'At-risk Groups' },
+  { to: '/agencies', label: 'Agencies' },
 ];
 
 export default function AppHeader() {
@@ -54,9 +55,9 @@ export default function AppHeader() {
             </button>
             {menuOpen && (
               <div className={styles.dropdown} role="menu">
-                <a role="menuitem" href="#help">
+                <Link role="menuitem" to="/help" onClick={() => setMenuOpen(false)}>
                   Help &amp; documentation
-                </a>
+                </Link>
                 <a role="menuitem" href="#settings">
                   Settings
                 </a>

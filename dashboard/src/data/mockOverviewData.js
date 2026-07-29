@@ -1,5 +1,8 @@
 /**
- * Mock data backing the Overview page.
+ * Mock data backing the Overview page. Agency-level data (used to be a
+ * separate `agencyAlerts` export here) now lives in `mockAgencyData.js` /
+ * `agencyService.js` — Overview's review queue reads from there so there is
+ * one source of truth for agency data across Overview and the Agencies page.
  */
 
 export const OVERVIEW_REPORTING_PERIOD_OPTIONS = [
@@ -22,8 +25,9 @@ const overviewSnapshots = {
     },
     activeAgencies: { value: 61, subtitle: 'No change' },
     allocationAlerts: { value: 3, subtitle: '2 need review' },
-    nextMonthForecast: { value: 57100, confidence: 'low' },
+    nextMonthForecast: { monthLabel: 'September 2026', isoMonth: '2026-09', value: 57100, confidence: 'low' },
     lastUpdated: '2026-07-01T06:00:00-04:00',
+    modelLastRun: '2026-06-30T23:45:00-04:00',
     populationSignals: [
       { id: 'newcomer-families', label: 'Newcomer families', changePct: 78 },
       { id: 'single-parent', label: 'Single-parent HH', changePct: 61 },
@@ -43,8 +47,9 @@ const overviewSnapshots = {
     },
     activeAgencies: { value: 60, subtitle: '+1 since June' },
     allocationAlerts: { value: 1, subtitle: '0 need review' },
-    nextMonthForecast: { value: 54200, confidence: 'high' },
+    nextMonthForecast: { monthLabel: 'August 2026', isoMonth: '2026-08', value: 54200, confidence: 'high' },
     lastUpdated: '2026-06-01T06:00:00-04:00',
+    modelLastRun: '2026-05-31T23:45:00-04:00',
     populationSignals: [
       { id: 'newcomer-families', label: 'Newcomer families', changePct: 71 },
       { id: 'single-parent', label: 'Single-parent HH', changePct: 55 },
@@ -57,24 +62,3 @@ const overviewSnapshots = {
 export function getOverviewSnapshot(period = 'aug-2026') {
   return overviewSnapshots[period] || overviewSnapshots['aug-2026'];
 }
-
-export const agencyAlerts = [
-  {
-    id: 'kw-ymca',
-    name: 'KW YMCA',
-    status: 'High demand',
-    trend: [32, 38, 55, 68],
-  },
-  {
-    id: 'cambridge-food-bank',
-    name: 'Cambridge Food Bank',
-    status: 'Watch',
-    trend: [30, 34, 46, 52],
-  },
-  {
-    id: 'waterloo-community-centre',
-    name: 'Waterloo Community Centre',
-    status: 'Normal',
-    trend: [40, 39, 41, 40],
-  },
-];

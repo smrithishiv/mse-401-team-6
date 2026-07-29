@@ -1,9 +1,13 @@
-import { useCallback, useState } from 'react';
-import { Users, Bell, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Users, Bell, ArrowRight } from 'lucide-react';
 import PageContainer from '../components/PageContainer';
-import MetricCard from '../components/MetricCard';
+import ActionableMetricCard from '../components/ActionableMetricCard';
 import ConfidenceBadge from '../components/ConfidenceBadge';
 import StatusBadge from '../components/StatusBadge';
+import InfoTooltip from '../components/InfoTooltip';
+import DataFreshness from '../components/DataFreshness';
+import OperationalSummary from '../components/OperationalSummary';
 import PopulationSignalBar from '../components/PopulationSignalBar';
 import AgencyAlertsTable from '../components/AgencyAlertsTable';
 import CompactFilterBar from '../components/CompactFilterBar';
@@ -11,44 +15,45 @@ import LoadingSkeleton from '../components/LoadingSkeleton';
 import ErrorState from '../components/ErrorState';
 import ExportReportButton from '../components/ExportReportButton';
 import { useAsync } from '../hooks/useAsync';
-import { getOverviewSummary, getAgencyAlerts } from '../services/overviewService';
+import { getOverviewSummary, getOperationalSummary } from '../services/overviewService';
+import { getAgencyAlerts } from '../services/agencyService';
 import { overviewCompactFilterFields, overviewCompactFilterDefaults } from '../config/filterFields';
-import { formatNumber, formatPct, formatRange, formatDateTime } from '../utils/format';
+import { formatNumber, formatPct, formatRange } from '../utils/format';
 import styles from './OverviewPage.module.css';
 
-async function loadOverview(period, agency) {
-  const [summary, agencies] = await Promise.all([
+async function loadOverview(period) {
+  const [summary, agencies, operationalSummary] = await Promise.all([
     getOverviewSummary(period),
-    getAgencyAlerts({ agency }),
+    getAgencyAlerts(),
+    getOperationalSummary(period),
   ]);
-  return { summary, agencies };
+  return { summary, agencies, operationalSummary };
 }
 
 // Overview intentionally stays a stable, organization-wide summary — no full
 // filter drawer here (see FilterUIContext: this page never registers one, so
-// AppHeader's filter icon doesn't appear on this route). Just a compact
-// reporting-period + agency selector, both backed by real mock snapshots.
+// AppHeader's filter icon doesn't appear on this route), and no agency
+// selector: it represents the whole organization and must be useful without
+// picking an agency first (use the Agencies page for that).
 export default function OverviewPage() {
   const [compactFilters, setCompactFilters] = useState(overviewCompactFilterDefaults);
   const { data, loading, error, retry } = useAsync(
-    () => loadOverview(compactFilters.period, compactFilters.agency),
-    [compactFilters.period, compactFilters.agency]
+    () => loadOverview(compactFilters.period),
+    [compactFilters.period]
   );
 
-  const handleCompactFilterChange = useCallback((id, value) => {
+  const handleCompactFilterChange = (id, value) => {
     setCompactFilters((prev) => ({ ...prev, [id]: value }));
-  }, []);
+  };
 
-  const handleReview = useCallback((agency) => {
-    // eslint-disable-next-line no-alert
-    alert(`Opening review workflow for ${agency.name} (not yet implemented).`);
-  }, []);
+  const needingReview = data?.agencies.filter((a) => a.reviewRequired) ?? [];
 
   return (
     <PageContainer
       title="Overview"
       actions={
         <>
+          {data && <DataFreshness dataUpdated={data.summary.lastUpdated} modelLastRun={data.summary.modelLastRun} />}
           <CompactFilterBar
             fields={overviewCompactFilterFields}
             values={compactFilters}
@@ -63,20 +68,25 @@ export default function OverviewPage() {
       {!error && loading && (
         <>
           <LoadingSkeleton variant="block" height={90} />
+          <LoadingSkeleton variant="block" height={90} />
           <LoadingSkeleton variant="cards" count={3} />
-          <LoadingSkeleton variant="chart" height={140} />
           <LoadingSkeleton variant="table" count={2} />
         </>
       )}
 
       {!error && !loading && data && (
         <>
-          <section className={`card ${styles.heroCard}`}>
+          <OperationalSummary items={data.operationalSummary} />
+
+          <Link to="/forecast" className={`card ${styles.heroCard}`} aria-label="Predicted hamper demand — view forecast details">
             <p className={styles.heroLabel}>Predicted hamper demand — {data.summary.predictedDemand.monthLabel}</p>
             <div className={styles.heroRow}>
               <h2 className={styles.heroValue}>{formatNumber(data.summary.predictedDemand.value)} people</h2>
               {data.summary.predictedDemand.confidence && (
-                <ConfidenceBadge level={data.summary.predictedDemand.confidence} />
+                <span className={styles.heroBadgeRow}>
+                  <ConfidenceBadge level={data.summary.predictedDemand.confidence} />
+                  <InfoTooltip content="High confidence means the predicted range is within ±5% of the forecast, so it can generally be used without manual confirmation. Below that it's flagged low and needs manual confirmation." />
+                </span>
               )}
               {data.summary.predictedDemand.isActual && <StatusBadge status="Actual" tone="grey" />}
             </div>
@@ -94,38 +104,48 @@ export default function OverviewPage() {
               <strong>{data.summary.predictedDemand.recommendationTitle}</strong>
               <p>{data.summary.predictedDemand.recommendationHelp}</p>
             </div>
-          </section>
+            <span className={styles.heroLink}>
+              View forecast details <ArrowRight size={14} aria-hidden="true" />
+            </span>
+          </Link>
 
           <section className={styles.metricGrid}>
-            <MetricCard
+            <ActionableMetricCard
+              to="/agencies"
+              ariaLabel={`Active agencies: ${data.summary.activeAgencies.value}. View all agencies.`}
               label="Active agencies"
               value={data.summary.activeAgencies.value}
               subtitle={data.summary.activeAgencies.subtitle}
             >
               <Users size={16} className={styles.cardIcon} aria-hidden="true" />
-            </MetricCard>
-            <MetricCard
+            </ActionableMetricCard>
+            <ActionableMetricCard
+              to="/agencies?status=review"
+              ariaLabel={`Allocation alerts: ${data.summary.allocationAlerts.value}. Open review queue.`}
               label="Allocation alerts"
               value={data.summary.allocationAlerts.value}
               subtitle={data.summary.allocationAlerts.subtitle}
             >
               <Bell size={16} className={styles.cardIcon} aria-hidden="true" />
-            </MetricCard>
-            <MetricCard label="Next month forecast" value={formatNumber(data.summary.nextMonthForecast.value)}>
+            </ActionableMetricCard>
+            <ActionableMetricCard
+              to={`/forecast?month=${data.summary.nextMonthForecast.isoMonth}`}
+              ariaLabel={`Next month forecast: ${formatNumber(data.summary.nextMonthForecast.value)}. View forecast.`}
+              label="Next month forecast"
+              value={formatNumber(data.summary.nextMonthForecast.value)}
+            >
               <ConfidenceBadge level={data.summary.nextMonthForecast.confidence} />
-            </MetricCard>
+            </ActionableMetricCard>
           </section>
-
-          <p className={styles.updated}>
-            <TrendingUp size={14} aria-hidden="true" /> Data last updated{' '}
-            <strong>{formatDateTime(data.summary.lastUpdated)}</strong>
-          </p>
 
           <div className={styles.twoCol}>
             <section className={`card ${styles.panel}`}>
               <div className={styles.panelHeader}>
-                <h2>Top population signals</h2>
-                <a href="#view-all-signals">View all →</a>
+                <h2>
+                  Top population signals{' '}
+                  <InfoTooltip content="Shows which demographic groups are driving demand growth fastest, as a percentage change versus a baseline period." />
+                </h2>
+                <Link to="/at-risk-groups">View all →</Link>
               </div>
               <div className={styles.signalList}>
                 {data.summary.populationSignals.map((s) => (
@@ -137,9 +157,9 @@ export default function OverviewPage() {
             <section className={`card ${styles.panel}`}>
               <div className={styles.panelHeader}>
                 <h2>Agencies needing review</h2>
-                <a href="#view-all-agencies">View all {data.summary.activeAgencies.value} →</a>
+                {needingReview.length > 0 && <Link to="/agencies?status=review">Open review queue →</Link>}
               </div>
-              <AgencyAlertsTable agencies={data.agencies} onReview={handleReview} />
+              <AgencyAlertsTable agencies={data.agencies} />
             </section>
           </div>
         </>

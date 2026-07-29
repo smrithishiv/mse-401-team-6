@@ -8,7 +8,8 @@
 
 import { GEOGRAPHY_OPTIONS } from '../utils/geography';
 import { atRiskPopulationSignals, socioeconomicSignals, riskLegend, REPORTING_PERIOD_OPTIONS } from '../data/mockRiskData';
-import { agencyAlerts, OVERVIEW_REPORTING_PERIOD_OPTIONS } from '../data/mockOverviewData';
+import { OVERVIEW_REPORTING_PERIOD_OPTIONS } from '../data/mockOverviewData';
+import { AGENCY_STATUS_LABELS, AGENCY_CITIES } from '../data/mockAgencyData';
 
 const withAll = (options, allLabel = 'All') => [{ value: 'all', label: allLabel }, ...options];
 
@@ -112,13 +113,13 @@ export const atRiskFilterFields = [
 ];
 
 // ---------------------------------------------------------------------------
-// Overview page — compact, not a drawer. Just a reporting period and an
-// agency selector, both directly backed by data the mock service already has.
+// Overview page — compact, not a drawer, and no per-agency selector: the
+// page represents the whole organization and must be useful without picking
+// an agency first. Just a reporting period.
 // ---------------------------------------------------------------------------
 
 export const overviewCompactFilterDefaults = {
   period: 'aug-2026',
-  agency: 'all',
 };
 
 export const overviewCompactFilterFields = [
@@ -127,12 +128,47 @@ export const overviewCompactFilterFields = [
     label: 'Reporting period',
     options: OVERVIEW_REPORTING_PERIOD_OPTIONS,
   },
+];
+
+// ---------------------------------------------------------------------------
+// Agencies directory page
+// ---------------------------------------------------------------------------
+
+export const agencyFilterDefaults = {
+  status: 'all',
+  city: 'all',
+  reviewRequired: 'all',
+  trend: 'all',
+};
+
+export const agencyFilterFields = [
   {
-    id: 'agency',
-    label: 'Agency',
-    options: withAll(
-      agencyAlerts.map((a) => ({ value: a.id, label: a.name })),
-      'All agencies'
-    ),
+    id: 'status',
+    label: 'Status',
+    options: withAll(Object.entries(AGENCY_STATUS_LABELS).map(([value, label]) => ({ value, label }))),
+  },
+  {
+    id: 'city',
+    label: 'City / service area',
+    options: withAll(AGENCY_CITIES.map((city) => ({ value: city, label: city }))),
+  },
+  {
+    id: 'reviewRequired',
+    label: 'Review required',
+    options: [
+      { value: 'all', label: 'All' },
+      { value: 'true', label: 'Requires review' },
+      { value: 'false', label: 'No review required' },
+    ],
+  },
+  {
+    id: 'trend',
+    label: 'Demand trend',
+    options: [
+      { value: 'all', label: 'All' },
+      { value: 'rising', label: 'Rising' },
+      { value: 'stable', label: 'Stable' },
+      { value: 'falling', label: 'Falling' },
+    ],
   },
 ];

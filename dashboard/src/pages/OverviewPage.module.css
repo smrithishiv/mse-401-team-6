@@ -3,6 +3,42 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.heroCard:hover {
+  border-color: var(--bb-blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.heroCard:hover .heroLink {
+  color: var(--bb-blue-dark);
+}
+
+.heroCard:focus-visible {
+  outline: 3px solid var(--bb-blue);
+  outline-offset: 2px;
+}
+
+.heroBadgeRow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.heroLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-3);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bb-blue);
+  align-self: flex-start;
 }
 
 .heroLabel {
@@ -59,17 +95,9 @@
   color: var(--bb-blue);
 }
 
-.updated {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
 .twoCol {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  grid-template-columns: 1fr 1.6fr;
   gap: var(--space-5);
   align-items: start;
 }
@@ -83,19 +111,28 @@
 
 .panelHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .panelHeader h2 {
   font-size: 16px;
   font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .panelHeader a {
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .signalList {

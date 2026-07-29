@@ -8,6 +8,7 @@ export const operationalForecast = {
   months: [
     {
       id: 'jul-2026',
+      isoMonth: '2026-07',
       label: 'July 2026',
       subLabel: '(Jul – Sep 2026)',
       type: 'actual',
@@ -16,6 +17,7 @@ export const operationalForecast = {
     },
     {
       id: 'aug-2026',
+      isoMonth: '2026-08',
       label: 'Aug 2026',
       type: 'predicted',
       value: 54200,
@@ -25,6 +27,7 @@ export const operationalForecast = {
     },
     {
       id: 'sep-2026',
+      isoMonth: '2026-09',
       label: 'Sept 2026',
       type: 'predicted',
       value: 57100,

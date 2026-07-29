@@ -1,0 +1,12 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.icon {
+  flex-shrink: 0;
+}

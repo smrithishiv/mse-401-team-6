@@ -1,0 +1,50 @@
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-primary);
+  border: 1px solid transparent;
+}
+
+.item:hover {
+  background: var(--bg-subtle);
+}
+
+.item:focus-visible {
+  outline: 3px solid var(--bb-blue);
+  outline-offset: 2px;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.message {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.success .icon {
+  color: var(--bb-green);
+}
+
+.warning .icon {
+  color: #9a6c0f;
+}
+
+.critical .icon {
+  color: var(--bb-red);
+}
+
+.info .icon {
+  color: var(--bb-blue);
+}

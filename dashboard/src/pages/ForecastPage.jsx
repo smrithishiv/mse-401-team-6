@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
 import SegmentedToggle from '../components/SegmentedToggle';
 import FilterDrawer from '../components/FilterDrawer';
@@ -11,15 +12,25 @@ import { usePageFilters } from '../hooks/usePageFilters';
 import { useForecastMode } from '../hooks/useForecastMode';
 import { getOperationalForecast, getStrategicForecast } from '../services/forecastService';
 import { forecastFilterFields, forecastFilterDefaults } from '../config/filterFields';
+import { operationalForecast } from '../data/mockForecastData';
 
 const MODE_OPTIONS = [
   { value: 'operational', label: 'Operational' },
   { value: 'strategic', label: 'Strategic' },
 ];
 
+// Lets links like Overview's "Next month forecast" card
+// (/forecast?month=2026-09) land directly on the right operational month.
+const MONTH_ID_BY_ISO_MONTH = Object.fromEntries(
+  operationalForecast.months.map((m) => [m.isoMonth, m.id])
+);
+
 export default function ForecastPage() {
+  const [searchParams] = useSearchParams();
   const filters = usePageFilters({ fields: forecastFilterFields, defaults: forecastFilterDefaults });
-  const { mode, setMode, selectedMonthId, setSelectedMonthId } = useForecastMode();
+  const monthParam = searchParams.get('month');
+  const initialMonthId = MONTH_ID_BY_ISO_MONTH[monthParam] ?? null;
+  const { mode, setMode, selectedMonthId, setSelectedMonthId } = useForecastMode('operational', initialMonthId);
 
   // Fetched independently (rather than switched on `mode`) so toggling modes
   // can never briefly render one mode's view with the other mode's data shape

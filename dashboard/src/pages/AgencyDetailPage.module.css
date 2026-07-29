@@ -1,0 +1,75 @@
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.chartCard,
+.panel {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.chartTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.diffUp {
+  color: var(--bb-red);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.diffDown {
+  color: var(--bb-green);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.diffFlat {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.alertRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.noAlerts {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.recommendedAction {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.lastUpdated {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.notFound {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: center;
+  text-align: center;
+}
