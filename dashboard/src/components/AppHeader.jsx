@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { ChevronDown, Filter, Wheat } from 'lucide-react';
 import { useState } from 'react';
-import { useFilters } from '../context/FilterContext';
+import { useFilterUI } from '../context/FilterUIContext';
 import styles from './AppHeader.module.css';
 
 const NAV_LINKS = [
@@ -12,7 +12,7 @@ const NAV_LINKS = [
 
 export default function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { openDrawer, activeFilterCount } = useFilters();
+  const { pageFilterUI } = useFilterUI();
 
   return (
     <header className={styles.header}>
@@ -66,15 +66,19 @@ export default function AppHeader() {
               </div>
             )}
           </div>
-          <button
-            type="button"
-            className={styles.filterButton}
-            aria-label="Open filters"
-            onClick={openDrawer}
-          >
-            <Filter size={18} />
-            {activeFilterCount > 0 && <span className={styles.filterBadge}>{activeFilterCount}</span>}
-          </button>
+          {pageFilterUI.hasFilters && (
+            <button
+              type="button"
+              className={styles.filterButton}
+              aria-label="Open filters"
+              onClick={pageFilterUI.openDrawer}
+            >
+              <Filter size={18} />
+              {pageFilterUI.activeCount > 0 && (
+                <span className={styles.filterBadge}>{pageFilterUI.activeCount}</span>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </header>

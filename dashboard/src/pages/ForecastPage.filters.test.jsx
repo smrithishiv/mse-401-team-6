@@ -1,19 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { FilterProvider } from '../context/FilterContext';
+import { FilterUIProvider } from '../context/FilterUIContext';
 import AppHeader from '../components/AppHeader';
-import FilterDrawer from '../components/FilterDrawer';
 import ForecastPage from './ForecastPage';
 
 function renderApp() {
   return render(
     <MemoryRouter>
-      <FilterProvider>
+      <FilterUIProvider>
         <AppHeader />
-        <FilterDrawer />
         <ForecastPage />
-      </FilterProvider>
+      </FilterUIProvider>
     </MemoryRouter>
   );
 }
@@ -45,5 +43,13 @@ describe('Filter application', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
 
     expect(await screen.findByText('54,200', {}, { timeout: 3000 })).toBeInTheDocument();
+  });
+
+  it('does not show a Geography filter on the Forecast page (unsupported by forecast data)', async () => {
+    renderApp();
+    await screen.findByText('54,200', {}, { timeout: 3000 });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open filters' }));
+    expect(screen.queryByLabelText('Geography')).not.toBeInTheDocument();
   });
 });

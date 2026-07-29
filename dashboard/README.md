@@ -115,12 +115,50 @@ Set the real backend's URL in `.env`:
 VITE_API_BASE_URL=https://your-backend.example.com
 ```
 
+## Filter architecture
+
+There is **one reusable filter system**, not three copies of the same panel.
+Each page configures it with only the fields that match its own analytical
+purpose, and filters are page-local by default — nothing carries between
+routes automatically.
+
+- **`src/config/filterFields.js`** declares each page's field list
+  (`forecastFilterFields`, `atRiskFilterFields`, `overviewCompactFilterFields`)
+  plus their defaults. This is the single place that decides which controls a
+  page gets. Notably, **Forecast has no Geography filter** — the forecast
+  mock/service data has no regional breakdown, so showing that control would
+  imply model support that doesn't exist yet. At-risk Groups does have one,
+  built from `src/utils/geography.js`, which reads the region catalog out of
+  `mockRiskData.js` — if geography is later promoted to a dashboard-wide
+  context (e.g. once the forecast model gains regional data), that context
+  should source its region list from `geography.js` too, rather than
+  duplicating it.
+- **`usePageFilters`** (`src/hooks/usePageFilters.js`) is the hook Forecast
+  and At-risk Groups each instantiate independently. It owns that page's
+  draft/applied filter values and drawer open state as local `useState` —
+  never shared, never persisted elsewhere — so filter selections can't leak
+  from one page into another. Draft edits only take effect on "Apply filters"
+  (or are cleared on "Reset"), so pages don't refetch on every keystroke.
+- **`FilterUIContext`** (`src/context/FilterUIContext.jsx`) is a thin,
+  separate context that only carries UI wiring: whichever page currently has
+  filters registers `{ hasFilters, activeCount, openDrawer }` so `AppHeader`
+  knows whether to render the filter icon and what it should open. It carries
+  no filter *values* — that stays in each page via `usePageFilters`. Because
+  registration happens in an effect that cleans up on unmount, navigating to
+  Overview (which never calls `usePageFilters`) automatically clears it, so
+  the header filter icon disappears there.
+- **`FilterDrawer`** (`src/components/FilterDrawer.jsx`) is generic and
+  config-driven — it renders whatever `fields` a page passes in, with no
+  knowledge of Forecast vs. At-risk Groups. Both pages reuse the same
+  component with different configs.
+- **Overview** intentionally skips the drawer. It stays a stable,
+  organization-wide summary with just `CompactFilterBar`
+  (`src/components/CompactFilterBar.jsx`) — a reporting-period selector and
+  an agency selector, both inline in the page header, both backed by real
+  mock snapshots (see `getOverviewSnapshot` in `mockOverviewData.js`).
+
 ## State management
 
-- **`FilterContext`** (`src/context/FilterContext.jsx`) holds the applied
-  filters, a draft copy edited inside the `FilterDrawer`, and drawer
-  open/close state. Draft changes only take effect on "Apply filters" (or
-  are cleared on "Reset"), so pages don't refetch on every keystroke.
 - **`useAsync`** (`src/hooks/useAsync.js`) is the generic data-fetching hook
   every page uses — tracks `data` / `loading` / `error` and exposes `retry`
   for the `ErrorState` component's retry button.
@@ -128,8 +166,8 @@ VITE_API_BASE_URL=https://your-backend.example.com
   local to the Forecast page for the Operational/Strategic toggle and the
   selected month card.
 
-No Redux — the app's state needs are simple enough that Context + a couple
-of hooks cover it without extra ceremony.
+No Redux — the app's state needs are simple enough that a couple of local
+hooks plus the one small `FilterUIContext` cover it without extra ceremony.
 
 ## Exporting reports
 
@@ -142,10 +180,16 @@ a client-side stand-in for a future server-generated report endpoint.
 `src/**/*.test.js(x)` covers:
 
 - Forecast mode switching (`src/pages/ForecastPage.test.jsx`)
-- Filter application, including a real value-scaling check
-  (`src/pages/ForecastPage.filters.test.jsx`)
+- Forecast filter application, including a real value-scaling check and that
+  Geography is absent (`src/pages/ForecastPage.filters.test.jsx`)
+- At-risk Groups filters — Geography/Population/Risk Level/Socioeconomic
+  controls exist, geography narrows the map, reporting period changes the
+  numbers (`src/pages/AtRiskGroupsPage.filters.test.jsx`)
+- Overview's compact filters — no drawer icon, reporting period swaps
+  snapshots, agency selector filters the table (`src/pages/OverviewPage.test.jsx`)
+- `usePageFilters` draft/apply/reset semantics and that two page instances
+  never share state (`src/hooks/usePageFilters.test.jsx`)
 - Loading and error states, including retry (`src/hooks/useAsync.test.js`)
-- Filter context apply/reset semantics (`src/context/FilterContext.test.jsx`)
 - Forecast values rendered from the service layer
   (`src/services/forecastService.test.js`)
 

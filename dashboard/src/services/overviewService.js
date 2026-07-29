@@ -1,20 +1,27 @@
 import { mockRequest } from './api';
-import { overviewSummary, agencyAlerts } from '../data/mockOverviewData';
+import { getOverviewSnapshot, agencyAlerts } from '../data/mockOverviewData';
 
 /**
  * Future backend integration:
- *   export function getOverviewSummary() {
- *     return apiFetch('/api/overview');
+ *   export function getOverviewSummary(period) {
+ *     return apiFetch(`/api/overview${toQueryString({ period })}`);
  *   }
- *   export function getAgencyAlerts() {
- *     return apiFetch('/api/agencies/alerts');
+ *   export function getAgencyAlerts(filters) {
+ *     return apiFetch(`/api/agencies/alerts${toQueryString(filters)}`);
  *   }
  */
 
-export async function getOverviewSummary(options = {}) {
-  return mockRequest(overviewSummary, options);
+/** @param {string} period - e.g. 'aug-2026' */
+export async function getOverviewSummary(period = 'aug-2026', options = {}) {
+  return mockRequest(getOverviewSnapshot(period), options);
 }
 
-export async function getAgencyAlerts(options = {}) {
-  return mockRequest(agencyAlerts, options);
+/** @param {{ agency?: string, forceError?: boolean }} filters */
+export async function getAgencyAlerts(filters = {}) {
+  const filtered =
+    filters.agency && filters.agency !== 'all'
+      ? agencyAlerts.filter((a) => a.id === filters.agency)
+      : agencyAlerts;
+
+  return mockRequest(filtered, { forceError: filters.forceError });
 }

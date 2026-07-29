@@ -3,19 +3,20 @@
  * (non-geographically-precise) SVG polygon map of Waterloo Region.
  */
 
-export const atRiskMetrics = {
-  highRiskGroups: { value: 3, subtitle: '1 new signal' },
-  highRiskAreas: { value: 4, subtitle: '↑ N. Kitchener' },
-  avgRiskIndex: { value: 6.4, prevValue: 5.1 },
-  cpiFoodIndex: { valuePct: 9.2, subtitle: 'June 2026 YoY' },
-};
+export const RISK_LEVEL_ORDER = ['low', 'medium', 'med-high', 'high'];
+
+function shiftRiskLevel(level, steps) {
+  const idx = RISK_LEVEL_ORDER.indexOf(level);
+  const next = Math.min(RISK_LEVEL_ORDER.length - 1, Math.max(0, idx + steps));
+  return RISK_LEVEL_ORDER[next];
+}
 
 /**
  * Simplified, gapless grid layout (viewBox "0 0 480 420") — not
  * geographically precise, but visually reads as adjoining regions the way
- * the prototype's map does.
+ * the prototype's map does. This is the June 2026 (current/default) snapshot.
  */
-export const riskRegions = [
+const juneRiskRegions = [
   {
     id: 'wilmot',
     name: 'Wilmot',
@@ -82,6 +83,49 @@ export const riskRegions = [
     labelPos: { x: 275, y: 378 },
   },
 ];
+
+/** May 2026: one risk tier lower per region, reflecting risk climbing into June. */
+const mayRiskRegions = juneRiskRegions.map((region) => ({
+  ...region,
+  riskLevel: shiftRiskLevel(region.riskLevel, -1),
+}));
+
+const riskRegionsByPeriod = {
+  'jun-2026': juneRiskRegions,
+  'may-2026': mayRiskRegions,
+};
+
+const atRiskMetricsByPeriod = {
+  'jun-2026': {
+    highRiskGroups: { value: 3, subtitle: '1 new signal' },
+    highRiskAreas: { value: 4, subtitle: '↑ N. Kitchener' },
+    avgRiskIndex: { value: 6.4, prevValue: 5.1 },
+    cpiFoodIndex: { valuePct: 9.2, subtitle: 'June 2026 YoY' },
+  },
+  'may-2026': {
+    highRiskGroups: { value: 2, subtitle: 'Stable' },
+    highRiskAreas: { value: 3, subtitle: 'No change' },
+    avgRiskIndex: { value: 5.1, prevValue: 4.6 },
+    cpiFoodIndex: { valuePct: 7.8, subtitle: 'May 2026 YoY' },
+  },
+};
+
+export const REPORTING_PERIOD_OPTIONS = [
+  { value: 'jun-2026', label: 'June 2026' },
+  { value: 'may-2026', label: 'May 2026' },
+];
+
+/** @param {string} period */
+export function getRiskSnapshot(period = 'jun-2026') {
+  return {
+    metrics: atRiskMetricsByPeriod[period] || atRiskMetricsByPeriod['jun-2026'],
+    regions: riskRegionsByPeriod[period] || riskRegionsByPeriod['jun-2026'],
+  };
+}
+
+// Exported for geography.js (canonical region catalog) and any code that
+// needs the full region list independent of a reporting period.
+export const riskRegions = juneRiskRegions;
 
 export const riskLegend = [
   { level: 'low', label: 'Low' },

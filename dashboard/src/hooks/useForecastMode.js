@@ -3,8 +3,8 @@ import { useState } from 'react';
 /**
  * Lightweight hook holding Forecast-page-local UI state: which mode
  * (operational vs strategic) is active, and which operational month card is
- * selected. Kept out of FilterContext since it doesn't need to be shared
- * outside the Forecast page.
+ * selected. Kept separate from the Forecast page's filters (usePageFilters)
+ * since this is view-mode state, not a query parameter.
  */
 export function useForecastMode(defaultMode = 'operational', defaultMonthId = null) {
   const [mode, setMode] = useState(defaultMode);

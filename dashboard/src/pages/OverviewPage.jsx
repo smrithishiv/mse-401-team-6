@@ -1,33 +1,43 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Users, Bell, TrendingUp } from 'lucide-react';
 import PageContainer from '../components/PageContainer';
 import MetricCard from '../components/MetricCard';
 import ConfidenceBadge from '../components/ConfidenceBadge';
+import StatusBadge from '../components/StatusBadge';
 import PopulationSignalBar from '../components/PopulationSignalBar';
 import AgencyAlertsTable from '../components/AgencyAlertsTable';
+import CompactFilterBar from '../components/CompactFilterBar';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ErrorState from '../components/ErrorState';
 import ExportReportButton from '../components/ExportReportButton';
 import { useAsync } from '../hooks/useAsync';
-import { useFilters } from '../context/FilterContext';
 import { getOverviewSummary, getAgencyAlerts } from '../services/overviewService';
+import { overviewCompactFilterFields, overviewCompactFilterDefaults } from '../config/filterFields';
 import { formatNumber, formatPct, formatRange, formatDateTime } from '../utils/format';
 import styles from './OverviewPage.module.css';
 
-async function loadOverview(filters) {
+async function loadOverview(period, agency) {
   const [summary, agencies] = await Promise.all([
-    getOverviewSummary({ forceError: filters.forceError }),
-    getAgencyAlerts({ forceError: filters.forceError }),
+    getOverviewSummary(period),
+    getAgencyAlerts({ agency }),
   ]);
   return { summary, agencies };
 }
 
+// Overview intentionally stays a stable, organization-wide summary — no full
+// filter drawer here (see FilterUIContext: this page never registers one, so
+// AppHeader's filter icon doesn't appear on this route). Just a compact
+// reporting-period + agency selector, both backed by real mock snapshots.
 export default function OverviewPage() {
-  const { appliedFilters } = useFilters();
+  const [compactFilters, setCompactFilters] = useState(overviewCompactFilterDefaults);
   const { data, loading, error, retry } = useAsync(
-    () => loadOverview(appliedFilters),
-    [appliedFilters]
+    () => loadOverview(compactFilters.period, compactFilters.agency),
+    [compactFilters.period, compactFilters.agency]
   );
+
+  const handleCompactFilterChange = useCallback((id, value) => {
+    setCompactFilters((prev) => ({ ...prev, [id]: value }));
+  }, []);
 
   const handleReview = useCallback((agency) => {
     // eslint-disable-next-line no-alert
@@ -37,7 +47,16 @@ export default function OverviewPage() {
   return (
     <PageContainer
       title="Overview"
-      actions={<ExportReportButton data={data} filename="overview-report" />}
+      actions={
+        <>
+          <CompactFilterBar
+            fields={overviewCompactFilterFields}
+            values={compactFilters}
+            onChange={handleCompactFilterChange}
+          />
+          <ExportReportButton data={data} filename="overview-report" />
+        </>
+      }
     >
       {error && <ErrorState message={error} onRetry={retry} />}
 
@@ -56,11 +75,20 @@ export default function OverviewPage() {
             <p className={styles.heroLabel}>Predicted hamper demand — {data.summary.predictedDemand.monthLabel}</p>
             <div className={styles.heroRow}>
               <h2 className={styles.heroValue}>{formatNumber(data.summary.predictedDemand.value)} people</h2>
-              <ConfidenceBadge level={data.summary.predictedDemand.confidence} />
+              {data.summary.predictedDemand.confidence && (
+                <ConfidenceBadge level={data.summary.predictedDemand.confidence} />
+              )}
+              {data.summary.predictedDemand.isActual && <StatusBadge status="Actual" tone="grey" />}
             </div>
             <p className={styles.heroSubtitle}>
-              {formatPct(data.summary.predictedDemand.vsPrevPct, { signed: true })} vs July · range{' '}
-              {formatRange(data.summary.predictedDemand.range)} people
+              {data.summary.predictedDemand.range ? (
+                <>
+                  {formatPct(data.summary.predictedDemand.vsPrevPct, { signed: true })} vs previous period · range{' '}
+                  {formatRange(data.summary.predictedDemand.range)} people
+                </>
+              ) : (
+                'Recorded actual figure for this reporting period.'
+              )}
             </p>
             <div className={styles.recommendation}>
               <strong>{data.summary.predictedDemand.recommendationTitle}</strong>

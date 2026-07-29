@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { FilterProvider } from '../context/FilterContext';
+import { FilterUIProvider } from '../context/FilterUIContext';
 import ForecastPage from './ForecastPage';
 
 function renderForecastPage() {
   return render(
     <MemoryRouter>
-      <FilterProvider>
+      <FilterUIProvider>
         <ForecastPage />
-      </FilterProvider>
+      </FilterUIProvider>
     </MemoryRouter>
   );
 }

@@ -3,20 +3,22 @@ import MetricCard from '../components/MetricCard';
 import RiskMap from '../components/RiskMap';
 import SocioeconomicSignalCard from '../components/SocioeconomicSignalCard';
 import PopulationSignalBar from '../components/PopulationSignalBar';
+import FilterDrawer from '../components/FilterDrawer';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ErrorState from '../components/ErrorState';
 import ExportReportButton from '../components/ExportReportButton';
 import { useAsync } from '../hooks/useAsync';
-import { useFilters } from '../context/FilterContext';
+import { usePageFilters } from '../hooks/usePageFilters';
 import { getAtRiskGroups } from '../services/riskService';
+import { atRiskFilterFields, atRiskFilterDefaults } from '../config/filterFields';
 import { formatPct } from '../utils/format';
 import styles from './AtRiskGroupsPage.module.css';
 
 export default function AtRiskGroupsPage() {
-  const { appliedFilters } = useFilters();
+  const filters = usePageFilters({ fields: atRiskFilterFields, defaults: atRiskFilterDefaults });
   const { data, loading, error, retry } = useAsync(
-    () => getAtRiskGroups(appliedFilters),
-    [appliedFilters]
+    () => getAtRiskGroups(filters.appliedFilters),
+    [filters.appliedFilters]
   );
 
   return (
@@ -24,6 +26,17 @@ export default function AtRiskGroupsPage() {
       title="At-risk Groups"
       actions={<ExportReportButton data={data} filename="at-risk-groups-report" />}
     >
+      <FilterDrawer
+        isOpen={filters.isDrawerOpen}
+        title="At-risk Groups Filters"
+        fields={filters.fields}
+        draftValues={filters.draftFilters}
+        onChangeField={filters.setDraftFilter}
+        onClose={filters.closeDrawer}
+        onApply={filters.applyFilters}
+        onReset={filters.resetFilters}
+      />
+
       {error && <ErrorState message={error} onRetry={retry} />}
 
       {!error && loading && (
@@ -54,15 +67,21 @@ export default function AtRiskGroupsPage() {
           <div className={styles.twoCol}>
             <section className={`card ${styles.mapPanel}`}>
               <h2 className={styles.panelTitle}>Food Insecurity Risk – Waterloo Region</h2>
-              <RiskMap regions={data.regions} legend={data.legend} />
+              {data.regions.length > 0 ? (
+                <RiskMap regions={data.regions} legend={data.legend} />
+              ) : (
+                <p className={styles.emptyMap}>No regions match the selected filters.</p>
+              )}
             </section>
 
             <section className={styles.signalsPanel}>
               <h2 className={styles.panelTitle}>Socioeconomic signals</h2>
               <div className={styles.signalGrid}>
-                {data.signals.map((signal) => (
-                  <SocioeconomicSignalCard key={signal.id} signal={signal} />
-                ))}
+                {data.signals.length > 0 ? (
+                  data.signals.map((signal) => <SocioeconomicSignalCard key={signal.id} signal={signal} />)
+                ) : (
+                  <p className={styles.emptyMap}>No indicators match the selected filters.</p>
+                )}
               </div>
             </section>
           </div>
@@ -70,9 +89,13 @@ export default function AtRiskGroupsPage() {
           <section className={`card ${styles.populationPanel}`}>
             <h2 className={styles.panelTitle}>Top population signals</h2>
             <div className={styles.populationGrid}>
-              {data.populationSignals.map((s) => (
-                <PopulationSignalBar key={s.id} label={s.label} changePct={s.changePct} max={100} />
-              ))}
+              {data.populationSignals.length > 0 ? (
+                data.populationSignals.map((s) => (
+                  <PopulationSignalBar key={s.id} label={s.label} changePct={s.changePct} max={100} />
+                ))
+              ) : (
+                <p className={styles.emptyMap}>No population groups match the selected filters.</p>
+              )}
             </div>
           </section>
         </>

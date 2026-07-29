@@ -43,6 +43,13 @@
   gap: var(--space-4);
 }
 
+.emptyMap {
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: var(--space-6);
+}
+
 @media (max-width: 900px) {
   .twoCol {
     grid-template-columns: 1fr;
