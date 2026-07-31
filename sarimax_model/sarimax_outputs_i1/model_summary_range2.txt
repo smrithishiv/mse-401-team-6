@@ -1,0 +1,29 @@
+                                     SARIMAX Results                                      
+==========================================================================================
+Dep. Variable:                total_people_served   No. Observations:                   42
+Model:             SARIMAX(2, 1, 0)x(1, 0, 0, 12)   Log Likelihood                -255.030
+Date:                            Thu, 30 Jul 2026   AIC                            524.059
+Time:                                    22:15:19   BIC                            533.130
+Sample:                                01-01-2022   HQIC                           526.757
+                                     - 06-01-2025                                         
+Covariance Type:                              opg                                         
+==========================================================================================
+                             coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+drift                    -35.4638     26.501     -1.338      0.181     -87.405      16.477
+unemployment_rate_lag1 -2501.8552    665.787     -3.758      0.000   -3806.775   -1196.936
+total_homeless_lag1    -1309.4153    799.463     -1.638      0.101   -2876.333     257.502
+ar.L1                     -1.0144      0.145     -6.986      0.000      -1.299      -0.730
+ar.L2                     -0.7278      0.118     -6.148      0.000      -0.960      -0.496
+ar.S.L12                   1.1185      0.205      5.448      0.000       0.716       1.521
+sigma2                  6.308e+06      0.218   2.89e+07      0.000    6.31e+06    6.31e+06
+===================================================================================
+Ljung-Box (L1) (Q):                   1.04   Jarque-Bera (JB):                 0.54
+Prob(Q):                              0.31   Prob(JB):                         0.76
+Heteroskedasticity (H):               0.57   Skew:                             0.34
+Prob(H) (two-sided):                  0.41   Kurtosis:                         2.86
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).
+[2] Covariance matrix is singular or near-singular, with condition number 6.05e+22. Standard errors may be unstable.
