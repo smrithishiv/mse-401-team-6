@@ -9,9 +9,9 @@ import styles from './InfoTooltip.module.css';
  * dismissible via Escape. Content is exposed to assistive tech through
  * `aria-describedby` + `role="tooltip"`, not colour alone.
  *
- * @param {{ label?: string, content: import('react').ReactNode, placement?: 'top' | 'bottom' }} props
+ * @param {{ label?: string, content: import('react').ReactNode, placement?: 'top' | 'bottom', wide?: boolean }} props
  */
-export default function InfoTooltip({ label = 'More information', content, placement = 'top' }) {
+export default function InfoTooltip({ label = 'More information', content, placement = 'top', wide = false }) {
   const [open, setOpen] = useState(false);
   const tooltipId = useId();
 
@@ -36,7 +36,7 @@ export default function InfoTooltip({ label = 'More information', content, place
         <Info size={13} aria-hidden="true" />
       </button>
       {open && (
-        <span role="tooltip" id={tooltipId} className={`${styles.tooltip} ${styles[placement]}`}>
+        <span role="tooltip" id={tooltipId} className={`${styles.tooltip} ${styles[placement]} ${wide ? styles.wide : ''}`}>
           {content}
         </span>
       )}

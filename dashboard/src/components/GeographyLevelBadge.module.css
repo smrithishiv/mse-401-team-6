@@ -1,0 +1,33 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.local,
+.municipal {
+  color: var(--bb-green);
+  background: var(--bb-green-bg);
+}
+
+.regional {
+  color: var(--bb-blue-dark);
+  background: var(--bb-blue-bg);
+}
+
+.estimated {
+  color: var(--bb-orange);
+  background: var(--bb-orange-bg);
+}
+
+.unavailable {
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+}

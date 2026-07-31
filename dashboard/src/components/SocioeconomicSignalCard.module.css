@@ -28,3 +28,7 @@
   font-size: 12px;
   color: var(--text-muted);
 }
+
+.footer {
+  margin-top: var(--space-1);
+}
