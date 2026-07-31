@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import AgencyStatusBadge from './AgencyStatusBadge';
 import FourWeekTrend from './FourWeekTrend';
 import StatusBadge from './StatusBadge';
+import SortableHeader from './SortableHeader';
 import { formatNumber, formatDateTime } from '../utils/format';
 import styles from './AgencyTable.module.css';
 
@@ -21,19 +21,6 @@ const COLUMNS = [
   { key: 'lastUpdated', label: 'Last updated' },
   { key: null, label: 'Action' },
 ];
-
-function SortableHeader({ label, columnKey, sortBy, sortDir, onSort }) {
-  if (!columnKey) return <span>{label}</span>;
-  const isActive = sortBy === columnKey;
-  const Icon = isActive ? (sortDir === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
-
-  return (
-    <button type="button" className={styles.sortButton} onClick={() => onSort(columnKey)}>
-      {label}
-      <Icon size={12} aria-hidden="true" className={isActive ? styles.sortActive : styles.sortIdle} />
-    </button>
-  );
-}
 
 /**
  * @param {{ agencies: Array, sortBy: string, sortDir: 'asc'|'desc', onSort: (key: string) => void }} props

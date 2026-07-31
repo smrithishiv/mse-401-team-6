@@ -8,6 +8,8 @@ import AtRiskGroupsPage from './pages/AtRiskGroupsPage';
 import AgenciesPage from './pages/AgenciesPage';
 import AgencyDetailPage from './pages/AgencyDetailPage';
 import HelpPage from './pages/HelpPage';
+import HelpProjectionsPage from './pages/HelpProjectionsPage';
+import ScenarioAnalysisPage from './pages/ScenarioAnalysisPage';
 
 export default function App() {
   return (
@@ -21,7 +23,9 @@ export default function App() {
           <Route path="/at-risk-groups" element={<AtRiskGroupsPage />} />
           <Route path="/agencies" element={<AgenciesPage />} />
           <Route path="/agencies/:agencyId" element={<AgencyDetailPage />} />
+          <Route path="/scenario-analysis" element={<ScenarioAnalysisPage />} />
           <Route path="/help" element={<HelpPage />} />
+          <Route path="/help/projections" element={<HelpProjectionsPage />} />
           <Route path="*" element={<Navigate to="/overview" replace />} />
         </Routes>
         <DashboardFooter />

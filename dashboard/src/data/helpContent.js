@@ -46,7 +46,7 @@ export const HELP_SECTIONS = [
     id: 'allocation-recommendations',
     title: '6. Allocation recommendations',
     paragraphs: [
-      'Allocation recommendations translate a forecast’s confidence into a concrete next step: "Proceed with current allocation" for high-confidence forecasts, or "Confirm allocation manually before distributing" when confidence is low.',
+      'Allocation recommendations translate a forecast’s confidence into a concrete next step: "Allocation on track" for high-confidence forecasts, or "Manual confirmation recommended" when confidence is low.',
     ],
   },
   {

@@ -10,6 +10,27 @@
   gap: var(--space-4);
 }
 
+.horizonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.horizonLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.variationTooltip {
+  display: inline-block;
+  margin-top: var(--space-1);
+}
+
 .chartCard {
   padding: var(--space-5);
 }

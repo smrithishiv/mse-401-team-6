@@ -13,7 +13,8 @@ export const operationalForecast = {
       subLabel: '(Jul – Sep 2026)',
       type: 'actual',
       value: 51840,
-      subtitle: 'Recorded, not a forecast',
+      statusKey: 'actual',
+      chartLabel: 'Jul',
     },
     {
       id: 'aug-2026',
@@ -23,7 +24,8 @@ export const operationalForecast = {
       value: 54200,
       range: { low: 51800, high: 56600, marginPct: 4.4 },
       confidence: 'high',
-      action: 'Proceed with current allocation',
+      statusKey: 'on-track',
+      chartLabel: 'Aug',
     },
     {
       id: 'sep-2026',
@@ -33,7 +35,8 @@ export const operationalForecast = {
       value: 57100,
       range: { low: 50400, high: 63800, marginPct: 11.7 },
       confidence: 'low',
-      action: 'Confirm allocation manually before distributing',
+      statusKey: 'manual-review',
+      chartLabel: 'Sep',
     },
   ],
   defaultSelectedMonthId: 'aug-2026',
@@ -56,45 +59,136 @@ export const operationalForecast = {
       { label: 'Sep', value: 57100, low: 50400, high: 63800 },
     ],
   },
-  driverBreakdown: {
-    monthLabel: 'August',
-    drivers: [
-      { id: 'newcomer-families', label: 'Newcomer Families', pctOfDemand: 28 },
-      { id: 'single-parent', label: 'Single Parent Households', pctOfDemand: 22 },
-      { id: 'seniors', label: 'Seniors (65+)', pctOfDemand: 14 },
+};
+
+// Week-level counterpart to `operationalForecast`, covering the same
+// Jun–Aug window at finer granularity. Per-group "who's driving the
+// number" explanations live in mockDriverExplanations.js, keyed by week id.
+export const operationalForecastWeekly = {
+  weeks: [
+    {
+      id: 'wk-2026-06-30',
+      weekStart: '2026-06-30',
+      weekEnd: '2026-07-06',
+      label: 'Jun 30 – Jul 6',
+      type: 'actual',
+      value: 12100,
+      changeFromPreviousWeekPct: null,
+      statusKey: 'actual',
+    },
+    {
+      id: 'wk-2026-07-07',
+      weekStart: '2026-07-07',
+      weekEnd: '2026-07-13',
+      label: 'Jul 7 – 13',
+      type: 'actual',
+      value: 12480,
+      changeFromPreviousWeekPct: 3.1,
+      statusKey: 'actual',
+    },
+    {
+      id: 'wk-2026-07-14',
+      weekStart: '2026-07-14',
+      weekEnd: '2026-07-20',
+      label: 'Jul 14 – 20',
+      type: 'actual',
+      value: 12800,
+      changeFromPreviousWeekPct: 2.6,
+      statusKey: 'actual',
+    },
+    {
+      id: 'wk-2026-07-21',
+      weekStart: '2026-07-21',
+      weekEnd: '2026-07-27',
+      label: 'Jul 21 – 27',
+      type: 'actual',
+      value: 13100,
+      changeFromPreviousWeekPct: 2.3,
+      statusKey: 'actual',
+    },
+    {
+      id: 'wk-2026-07-28',
+      weekStart: '2026-07-28',
+      weekEnd: '2026-08-03',
+      label: 'Jul 28 – Aug 3',
+      type: 'predicted',
+      value: 13500,
+      changeFromPreviousWeekPct: 3.1,
+      range: { low: 12950, high: 14050, marginPct: 4.1 },
+      confidence: 'high',
+      statusKey: 'on-track',
+      currentAllocation: 13000,
+      recommendedAllocation: 13500,
+    },
+    {
+      id: 'wk-2026-08-04',
+      weekStart: '2026-08-04',
+      weekEnd: '2026-08-10',
+      label: 'Aug 4 – 10',
+      type: 'predicted',
+      value: 14100,
+      changeFromPreviousWeekPct: 4.4,
+      range: { low: 12600, high: 15600, marginPct: 10.6 },
+      confidence: 'low',
+      statusKey: 'manual-review',
+      currentAllocation: 13500,
+      recommendedAllocation: 14100,
+    },
+  ],
+  defaultSelectedWeekId: 'wk-2026-07-28',
+  warning:
+    'The week of Aug 4–10 has lower confidence because two of its inputs (unemployment and rental vacancy) are projected forward rather than measured, and projections beyond 60 days carry more error.',
+  warningLinkLabel: 'Learn how projections work',
+  chart: {
+    historical: [
+      { label: 'Jun 30 – Jul 6', value: 12100 },
+      { label: 'Jul 7 – 13', value: 12480 },
+      { label: 'Jul 14 – 20', value: 12800 },
+      { label: 'Jul 21 – 27', value: 13100 },
+    ],
+    forecast: [
+      { label: 'Jul 21 – 27', value: 13100, low: 13100, high: 13100 },
+      { label: 'Jul 28 – Aug 3', value: 13500, low: 12950, high: 14050 },
+      { label: 'Aug 4 – 10', value: 14100, low: 12600, high: 15600 },
     ],
   },
 };
 
-export const strategicForecast = {
-  summary: {
-    fiveYearForecastValue: 2750000,
-    vsChangePct: 51,
-    expectedVariation: 33280,
-    expectedVariationPct: 1.2,
-    lastModelRun: '2026-06-30',
-  },
-  chart: {
-    historical: [
-      { label: '2024', value: 430000 },
-      { label: '2025', value: 452000 },
-      { label: '2026', value: 468000 },
-    ],
-    forecast: [
-      { label: '2026', value: 468000, low: 468000, high: 468000 },
-      { label: '2027', value: 495000, low: 483000, high: 507000 },
-      { label: '2028', value: 520000, low: 498000, high: 542000 },
-      { label: '2029', value: 552000, low: 519000, high: 585000 },
-      { label: '2030', value: 583000, low: 538000, high: 628000 },
-      { label: '2031', value: 618000, low: 555000, high: 681000 },
-    ],
-  },
-  // Powers the "Demand drivers — 5-year outlook" panel. `years` matches
-  // chart.forecast above (2026 = the connecting/base year through 2031).
-  // Each segment's `points[].people` is that segment's pct share of the
-  // matching year's total from chart.forecast, so segment people sum to
-  // the year's total demand exactly.
-  demandDrivers: {
+// Full 5-year historical+forecast series, kept as the source data that the
+// 2/3-year buckets are sliced from and the 10-year bucket extends.
+const FIVE_YEAR_HISTORICAL = [
+  { label: '2024', value: 430000 },
+  { label: '2025', value: 452000 },
+  { label: '2026', value: 468000 },
+];
+
+const FIVE_YEAR_FORECAST = [
+  { label: '2026', value: 468000, low: 468000, high: 468000 },
+  { label: '2027', value: 495000, low: 483000, high: 507000 },
+  { label: '2028', value: 520000, low: 498000, high: 542000 },
+  { label: '2029', value: 552000, low: 519000, high: 585000 },
+  { label: '2030', value: 583000, low: 538000, high: 628000 },
+  { label: '2031', value: 618000, low: 555000, high: 681000 },
+];
+
+// Hand-authored continuation of FIVE_YEAR_FORECAST through 2036. The
+// [low, high] band widens noticeably faster than the 5-year bucket's does,
+// year over year, so the strategic chart visibly shows uncertainty growing
+// with a longer horizon — this is what the ">5 years" notice refers to.
+const TEN_YEAR_FORECAST_TAIL = [
+  { label: '2032', value: 655000, low: 565000, high: 745000 },
+  { label: '2033', value: 693000, low: 565000, high: 821000 },
+  { label: '2034', value: 732000, low: 553000, high: 911000 },
+  { label: '2035', value: 772000, low: 525000, high: 1019000 },
+  { label: '2036', value: 813000, low: 480000, high: 1146000 },
+];
+
+// Powers the "Demand drivers — N-year outlook" panel. `years` matches the
+// 5-year chart above (2026 = the connecting/base year through 2031). Each
+// segment's `points[].people` is that segment's pct share of the matching
+// year's total from FIVE_YEAR_FORECAST, so segment people sum to the
+// year's total demand exactly.
+const FIVE_YEAR_DEMAND_DRIVERS = {
     years: [2026, 2027, 2028, 2029, 2030, 2031],
     dimensions: {
       ageGroup: {
@@ -265,6 +359,130 @@ export const strategicForecast = {
           },
         ],
       },
+    },
+  };
+/** Slices a chart's forecast series (plus its unchanged historical series) to years <= throughYear. */
+function sliceChart(historical, forecast, throughYear) {
+  return {
+    historical,
+    forecast: forecast.filter((p) => Number(p.label) <= throughYear),
+  };
+}
+
+/** Slices demand-driver years/points to years <= throughYear — used for the 2/3-year buckets. */
+function sliceDemandDrivers(demandDrivers, throughYear) {
+  return {
+    years: demandDrivers.years.filter((y) => y <= throughYear),
+    dimensions: Object.fromEntries(
+      Object.entries(demandDrivers.dimensions).map(([key, dimension]) => [
+        key,
+        {
+          dataType: dimension.dataType,
+          segments: dimension.segments.map((seg) => ({
+            ...seg,
+            points: seg.points.filter((p) => p.year <= throughYear),
+          })),
+        },
+      ])
+    ),
+  };
+}
+
+/**
+ * Extends demand-driver years/points through 2036 for the 10-year bucket by
+ * continuing each segment's most recent year-over-year pct trend, then
+ * rescaling each year's segments to sum to 100% and deriving `people` from
+ * the 10-year chart's total demand for that year. This is a mechanical
+ * extrapolation for demo purposes, not a real model projection.
+ */
+function extendDemandDrivers(demandDrivers, extraYears, totalByYear) {
+  const dimensions = Object.fromEntries(
+    Object.entries(demandDrivers.dimensions).map(([key, dimension]) => {
+      const segments = dimension.segments.map((seg) => {
+        const points = [...seg.points];
+        const last = points[points.length - 1];
+        const prev = points[points.length - 2];
+        const yearlyDelta = last.pct - prev.pct;
+        let currentPct = last.pct;
+
+        extraYears.forEach((year) => {
+          currentPct = Math.max(0, currentPct + yearlyDelta);
+          points.push({ year, pct: currentPct, people: 0 });
+        });
+
+        return { ...seg, points };
+      });
+
+      extraYears.forEach((year) => {
+        const yearPoints = segments.map((seg) => seg.points.find((p) => p.year === year));
+        const total = yearPoints.reduce((sum, p) => sum + p.pct, 0);
+        const scale = total > 0 ? 100 / total : 1;
+        let runningPct = 0;
+
+        yearPoints.forEach((point, i) => {
+          const isLast = i === yearPoints.length - 1;
+          point.pct = isLast ? 100 - runningPct : Math.round(point.pct * scale);
+          runningPct += point.pct;
+          point.people = Math.round((point.pct / 100) * totalByYear[year]);
+        });
+      });
+
+      return [key, { dataType: dimension.dataType, segments }];
+    })
+  );
+
+  return {
+    years: [...demandDrivers.years, ...extraYears],
+    dimensions,
+  };
+}
+
+const TEN_YEAR_FORECAST = [...FIVE_YEAR_FORECAST, ...TEN_YEAR_FORECAST_TAIL];
+const TEN_YEAR_TOTAL_BY_YEAR = Object.fromEntries(TEN_YEAR_FORECAST.map((p) => [Number(p.label), p.value]));
+
+/** Cumulative demand across a horizon's predicted years (excludes the connecting/base year). */
+function cumulativeForecastValue(forecast) {
+  return forecast.slice(1).reduce((sum, p) => sum + p.value, 0);
+}
+
+function summaryForBucket(forecast, vsChangePct) {
+  const finalYear = forecast[forecast.length - 1];
+  const expectedVariation = Math.round((finalYear.high - finalYear.low) / 2);
+  return {
+    forecastValue: cumulativeForecastValue(forecast),
+    vsChangePct,
+    expectedVariation,
+    expectedVariationPct: Math.round((expectedVariation / finalYear.value) * 1000) / 10,
+  };
+}
+
+const HORIZON_2_CHART = sliceChart(FIVE_YEAR_HISTORICAL, FIVE_YEAR_FORECAST, 2028);
+const HORIZON_3_CHART = sliceChart(FIVE_YEAR_HISTORICAL, FIVE_YEAR_FORECAST, 2029);
+const HORIZON_10_CHART = { historical: FIVE_YEAR_HISTORICAL, forecast: TEN_YEAR_FORECAST };
+
+export const strategicForecastByHorizon = {
+  supportedHorizons: [2, 3, 5, 10],
+  defaultHorizonYears: 5,
+  horizons: {
+    2: {
+      summary: summaryForBucket(HORIZON_2_CHART.forecast, 20),
+      chart: HORIZON_2_CHART,
+      demandDrivers: sliceDemandDrivers(FIVE_YEAR_DEMAND_DRIVERS, 2028),
+    },
+    3: {
+      summary: summaryForBucket(HORIZON_3_CHART.forecast, 31),
+      chart: HORIZON_3_CHART,
+      demandDrivers: sliceDemandDrivers(FIVE_YEAR_DEMAND_DRIVERS, 2029),
+    },
+    5: {
+      summary: { forecastValue: 2750000, vsChangePct: 51, expectedVariation: 33280, expectedVariationPct: 1.2 },
+      chart: { historical: FIVE_YEAR_HISTORICAL, forecast: FIVE_YEAR_FORECAST },
+      demandDrivers: FIVE_YEAR_DEMAND_DRIVERS,
+    },
+    10: {
+      summary: summaryForBucket(HORIZON_10_CHART.forecast, 85),
+      chart: HORIZON_10_CHART,
+      demandDrivers: extendDemandDrivers(FIVE_YEAR_DEMAND_DRIVERS, [2032, 2033, 2034, 2035, 2036], TEN_YEAR_TOTAL_BY_YEAR),
     },
   },
 };

@@ -1,0 +1,34 @@
+.tooltip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-3);
+  font-size: 13px;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltipLabel {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.dotBaseline,
+.dotScenario {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.dotBaseline {
+  background: var(--bb-grey);
+}
+
+.dotScenario {
+  background: var(--bb-purple);
+}

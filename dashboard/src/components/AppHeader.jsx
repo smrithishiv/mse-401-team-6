@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { to: '/forecast', label: 'Forecast' },
   { to: '/at-risk-groups', label: 'At-risk Groups' },
   { to: '/agencies', label: 'Agencies' },
+  { to: '/scenario-analysis', label: 'Scenario Analysis' },
 ];
 
 export default function AppHeader() {

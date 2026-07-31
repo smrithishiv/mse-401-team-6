@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import PageContainer from '../components/PageContainer';
 import DocumentationSection from '../components/DocumentationSection';
 import { HELP_SECTIONS } from '../data/helpContent';
@@ -6,6 +7,9 @@ import styles from './HelpPage.module.css';
 export default function HelpPage() {
   return (
     <PageContainer title="How to read this dashboard">
+      <p className={styles.projectionsLink}>
+        <Link to="/help/projections">How Projections Work →</Link>
+      </p>
       <div className={styles.layout}>
         <nav className={styles.toc} aria-label="Table of contents">
           <p className={styles.tocTitle}>On this page</p>

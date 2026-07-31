@@ -59,32 +59,6 @@
   font-weight: 700;
 }
 
-.sortButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  background: none;
-  color: var(--text-muted);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  font-weight: 700;
-  padding: 0;
-}
-
-.sortButton:hover {
-  color: var(--text-primary);
-}
-
-.sortActive {
-  color: var(--bb-blue);
-}
-
-.sortIdle {
-  opacity: 0.5;
-}
-
 .actionLink {
   color: var(--bb-blue);
   font-weight: 700;

@@ -8,6 +8,7 @@ import {
   YAxis,
   Tooltip,
   Legend,
+  ReferenceLine,
 } from 'recharts';
 import { mergeHistoricalAndForecast } from '../utils/chart';
 import { formatCompactNumber, formatNumber } from '../utils/format';
@@ -42,9 +43,32 @@ function ForecastTooltip({ active, payload, label }) {
 }
 
 /**
- * @param {{ historical: Array, forecast: Array, height?: number, yFormatter?: (v:number)=>string }} props
+ * Renders a larger, ringed dot at the point matching `selectedLabel`
+ * (falls back to the default small dot everywhere else) so a selected
+ * week/month is visually highlighted on the chart, not just in cards/table.
  */
-export default function ForecastChart({ historical, forecast, height = 320, yFormatter = formatCompactNumber }) {
+function makeSelectableDot(color, selectedLabel) {
+  return ({ cx, cy, value, payload }) => {
+    if (value === undefined || value === null) return null;
+    const isSelected = selectedLabel && payload.label === selectedLabel;
+    return isSelected ? (
+      <circle key={`dot-${payload.label}`} cx={cx} cy={cy} r={6} fill={color} stroke="var(--bg-card)" strokeWidth={2} />
+    ) : (
+      <circle key={`dot-${payload.label}`} cx={cx} cy={cy} r={3} fill={color} />
+    );
+  };
+}
+
+/**
+ * @param {{ historical: Array, forecast: Array, height?: number, yFormatter?: (v:number)=>string, selectedLabel?: string }} props
+ */
+export default function ForecastChart({
+  historical,
+  forecast,
+  height = 320,
+  yFormatter = formatCompactNumber,
+  selectedLabel,
+}) {
   const data = mergeHistoricalAndForecast(historical, forecast);
 
   return (
@@ -67,6 +91,9 @@ export default function ForecastChart({ historical, forecast, height = 320, yFor
             iconType="plainline"
             wrapperStyle={{ fontSize: 13, color: 'var(--text-secondary)' }}
           />
+          {selectedLabel && (
+            <ReferenceLine x={selectedLabel} stroke="var(--border-color-strong)" strokeDasharray="4 4" />
+          )}
           <Area
             dataKey={(d) => (d.low !== undefined && d.high !== undefined ? [d.low, d.high] : [null, null])}
             name="Confidence range"
@@ -82,7 +109,7 @@ export default function ForecastChart({ historical, forecast, height = 320, yFor
             name="Historical"
             stroke="var(--bb-blue)"
             strokeWidth={2.5}
-            dot={{ r: 3, fill: 'var(--bb-blue)' }}
+            dot={makeSelectableDot('var(--bb-blue)', selectedLabel)}
             connectNulls
             isAnimationActive={false}
           />
@@ -93,7 +120,7 @@ export default function ForecastChart({ historical, forecast, height = 320, yFor
             stroke="var(--bb-green)"
             strokeWidth={2.5}
             strokeDasharray="6 5"
-            dot={{ r: 3, fill: 'var(--bb-green)' }}
+            dot={makeSelectableDot('var(--bb-green)', selectedLabel)}
             connectNulls
             isAnimationActive={false}
           />

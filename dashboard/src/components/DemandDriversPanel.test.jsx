@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import DemandDriversPanel from './DemandDriversPanel';
-import { strategicForecast } from '../data/mockForecastData';
+import { strategicForecastByHorizon } from '../data/mockForecastData';
 
 function renderPanel() {
-  return render(<DemandDriversPanel data={strategicForecast.demandDrivers} />);
+  return render(<DemandDriversPanel data={strategicForecastByHorizon.horizons[5].demandDrivers} />);
 }
 
 describe('DemandDriversPanel', () => {

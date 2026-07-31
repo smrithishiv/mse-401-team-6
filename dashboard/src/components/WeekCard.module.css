@@ -1,0 +1,50 @@
+.weekCard {
+  text-align: left;
+  cursor: pointer;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.weekCard:hover {
+  border-color: var(--border-color-strong);
+}
+
+.weekCardSelected {
+  border-color: var(--bb-blue);
+  box-shadow: 0 0 0 3px var(--bb-blue-bg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.value {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}

@@ -1,0 +1,11 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badgeRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

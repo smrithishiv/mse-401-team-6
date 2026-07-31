@@ -1,0 +1,26 @@
+.tableCard {
+  padding: var(--space-5);
+}
+
+.actionCard {
+  padding: var(--space-5);
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.actionLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.actionValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
