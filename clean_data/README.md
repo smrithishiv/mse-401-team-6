@@ -2,6 +2,7 @@
 Model_Ready.csv:
 - **Feed this to your model**
 - Contains monthly aggregated foodbank data + relevant columns from Socioeconomic data + lagged columns for modelling
+- Data for certain socioeconomic factors may be missing from 2015-2019, use df.dropna() to remove those incomplete rows if you don't want to use them to train your model
 - *May need further scaling/additional columns depending on what model you are using*
 - *Feature selection and tuning is to your discretion*
 
