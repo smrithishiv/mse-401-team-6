@@ -1,0 +1,9 @@
+Holt-Winters (damped trend) fitted parameters
+==================================================
+smoothing_level: 0.0000
+smoothing_trend: 0.0000
+damping_trend: 0.9775
+smoothing_seasonal: 0.0000
+
+SSE: 224449338.27
+AIC: 684.64

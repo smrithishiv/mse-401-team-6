@@ -3,20 +3,28 @@ Demand Forecasting Model Comparison
 Food Bank of Waterloo Region — "Breaking Bread" Capstone (MSE 401)
 
 Forecasts `total_people_served` (unique individuals served, i.e. the sum of
-household sizes across households) and compares four approaches head-to-head:
+household sizes across households) and compares five approaches head-to-head:
 
-  1. SARIMAX with lagged socioeconomic regressors (order + trend selected by
-     held-out validation RMSE, not just in-sample AIC)
+  1. SARIMAX with 2 lagged socioeconomic regressors (order + trend selected
+     by held-out validation RMSE, not just in-sample AIC)
   2. Damped-trend Holt-Winters exponential smoothing (no exogenous inputs —
      the benchmark method used in the Rakestraw MIT food-bank study cited in
      the project report)
   3. Linear trend regression: time trend + annual seasonality (sin/cos) +
-     the same lagged exogenous regressors, fit by OLS. Simpler and more
+     the same 2 lagged exogenous regressors, fit by OLS. Simpler and more
      stable than SARIMAX on a ~40-90 row sample, in line with Lentz et al.'s
      preference for transparent regression models over complex ones.
-  4. Seasonal naive baseline (this month = same month last year)
+  4. Ridge regression: time trend + seasonality + ALL 7 available lagged
+     socioeconomic indicators (employment, inflation x2, housing, and 3
+     population/vulnerability measures). SARIMAX and OLS couldn't handle
+     this many correlated regressors (near-singular covariance, exploding
+     coefficients) — Ridge's L2 penalty is specifically built to stay stable
+     under multicollinearity, so it can incorporate the fuller indicator set
+     your project's "≥4 socioeconomic indicators" requirement calls for
+     without the numerical blowups SARIMAX had.
+  5. Seasonal naive baseline (this month = same month last year)
 
-Two training-window configurations are each run through all four models so
+Two training-window configurations are each run through all five models so
 you can see whether more (but older, pre-2022) history helps or hurts.
 
 Usage
@@ -25,15 +33,20 @@ Usage
 
 Expects a CSV named Model_Ready.csv (edit DATA_PATH below if it lives
 elsewhere), with at least these columns:
-    month, total_people_served, unemployment_rate_lag1, total_homeless_lag1
+    month, total_people_served, unemployment_rate_lag1, total_homeless_lag1,
+    cpi_all_items_lag1, cpi_food_lag1, cpi_shelter_lag1,
+    ow_beneficiaries_lag1, odsp_beneficiaries_lag1
 
-Outputs (written to ./sarimax_outputs/):
-    metrics_comparison.csv                        - MAE/RMSE/WAPE/R2 for every model x range, long format
-    actual_vs_predicted_<range>.png               - all 4 forecasts vs. actual, per range
+Outputs (written to ./sarimax_outputs_N/ — auto-incrementing so past runs
+are never overwritten):
+    metrics_comparison.csv                        - MAE/RMSE/WAPE/Bias/R2 for every model x range, long format
+    actual_vs_predicted_<range>.png               - all 5 forecasts vs. actual, per range
     feature_importance_sarimax_<range>.png/.csv    - SARIMAX standardized exog coefficients
-    feature_importance_linear_<range>.png/.csv     - linear model standardized coefficients
+    feature_importance_linear_<range>.png/.csv     - OLS linear model standardized coefficients
+    feature_importance_ridge_<range>.png/.csv      - Ridge model standardized coefficients (all 7 indicators)
     model_summary_sarimax_<range>.txt             - full statsmodels SARIMAX summary
     model_summary_linear_<range>.txt              - full statsmodels OLS summary
+    model_summary_ridge_<range>.txt               - selected alpha + coefficients
     model_summary_holtwinters_<range>.txt         - fitted smoothing parameters
 """
 
@@ -45,7 +58,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
+from sklearn.linear_model import RidgeCV
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import TimeSeriesSplit
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
@@ -79,14 +94,33 @@ EXOG_COLS = [
     "total_homeless_lag1",
 ]
 
+# Full candidate set of lagged socioeconomic indicators, used only by the
+# Ridge model below. Covers your project's required categories: employment
+# (unemployment_rate), inflation (cpi_all_items, cpi_food), housing
+# (cpi_shelter), and population/vulnerability (ow_beneficiaries,
+# odsp_beneficiaries, total_homeless) — 7 indicators, satisfying the "≥4
+# socioeconomic indicators as input features" requirement outright. SARIMAX
+# and OLS can't use this full set (that's what caused the near-singular
+# covariance matrix / exploding coefficients you saw); Ridge's L2 penalty
+# is built to stay stable when regressors are this correlated.
+FULL_EXOG_COLS = [
+    "unemployment_rate_lag1",
+    "cpi_all_items_lag1",
+    "cpi_food_lag1",
+    "cpi_shelter_lag1",
+    "ow_beneficiaries_lag1",
+    "odsp_beneficiaries_lag1",
+    "total_homeless_lag1",
+]
+
 SEASONAL_PERIOD = 12  # monthly data -> annual seasonality
 
 # Two training/testing windows to compare, per project requirements.
 # Both test on Jul 2025 onward; they differ only in how far back training goes.
 EXPERIMENTS = {
     "range1": {
-        "label": "Range 1: Train 2019–2025-06 / Test 2025-07 onward",
-        "train_start": "2019-01-01",
+        "label": "Range 1: Train 2019-02–2025-06 / Test 2025-07 onward",
+        "train_start": "2019-02-01",
         "train_end": "2025-06-30",
         "test_start": "2025-07-01",
     },
@@ -115,7 +149,18 @@ SEASONAL_Q_RANGE = range(0, 2)
 # combos where trend order <= d, which statsmodels rejects) lets the data decide.
 TREND_OPTIONS = (None, "t")
 
-OUTPUT_DIR = Path("sarimax_outputs")
+# Create sarimax_outputs_3, sarimax_outputs_4, ... inside this script's folder.
+_BASE_DIR = Path(__file__).resolve().parent
+
+def _next_output_dir():
+    n = 3
+    while (_BASE_DIR / f"sarimax_outputs_{n}").exists():
+        n += 1
+    out = _BASE_DIR / f"sarimax_outputs_{n}"
+    out.mkdir(parents=True, exist_ok=False)
+    return out
+
+OUTPUT_DIR = _next_output_dir()
 
 
 # ---------------------------------------------------------------------------
@@ -125,6 +170,20 @@ def load_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["month"])
     df = df.sort_values("month").set_index("month")
     df = df.asfreq("MS")  # enforce monthly-start frequency; exposes any gaps as NaN rows
+
+    # Model_Ready contains earlier years where socioeconomic variables are
+    # unavailable. Keep only complete months before passing data to any model.
+    df = df.dropna()
+
+    if df.empty:
+        raise ValueError(
+            f"No complete rows remain after dropping missing values from {path}."
+        )
+
+    print(
+        f"Using complete data from {df.index.min().date()} "
+        f"to {df.index.max().date()} ({len(df)} months)"
+    )
     return df
 
 
@@ -137,8 +196,13 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
     mae = mean_absolute_error(y_true, y_pred)
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
     wape = np.sum(np.abs(y_true - y_pred)) / np.sum(np.abs(y_true)) * 100
+    # Bias = mean signed error (pred - actual), NOT mean absolute error.
+    # Negative = model systematically underpredicts; positive = overpredicts.
+    # Same convention as the Random Forest team's numbers, so this is
+    # directly comparable across the whole team's model comparison matrix.
+    bias = np.mean(y_pred - y_true)
     r2 = r2_score(y_true, y_pred)
-    return {"MAE": mae, "RMSE": rmse, "WAPE_%": wape, "R2": r2}
+    return {"MAE": mae, "RMSE": rmse, "WAPE_%": wape, "Bias": bias, "R2": r2}
 
 
 # ---------------------------------------------------------------------------
@@ -220,6 +284,48 @@ def linear_trend_forecast(train: pd.DataFrame, test: pd.DataFrame, target: str,
 
 
 # ---------------------------------------------------------------------------
+# RIDGE REGRESSION — time trend + seasonality + ALL socioeconomic indicators
+#
+# Same design as linear_trend_forecast, but (a) uses the full 7-indicator
+# set instead of the trimmed 2, and (b) fits with L2-penalized (Ridge)
+# regression instead of plain OLS. The penalty shrinks correlated
+# coefficients together instead of letting them blow up, which is exactly
+# what OLS/SARIMAX couldn't handle about this feature set. Alpha (penalty
+# strength) is picked by time-series cross-validation on the training set
+# only, so no test-period information leaks into model selection.
+# ---------------------------------------------------------------------------
+def ridge_trend_forecast(train: pd.DataFrame, test: pd.DataFrame, target: str,
+                          exog_cols: list, seasonal_period: int = 12):
+    anchor = train.index.min()
+    X_train = _linear_design_matrix(train.index, anchor, train[exog_cols], seasonal_period)
+    X_test = _linear_design_matrix(test.index, anchor, test[exog_cols], seasonal_period)
+
+    X_mean = X_train.mean()
+    X_std = X_train.std().replace(0, 1)
+    X_train_z = (X_train - X_mean) / X_std
+    X_test_z = (X_test - X_mean) / X_std
+
+    y_train = train[target]
+    n_splits = min(5, max(len(y_train) // 8, 2))
+    tscv = TimeSeriesSplit(n_splits=n_splits)
+    alphas = np.logspace(-2, 3, 30)
+    ridge = RidgeCV(alphas=alphas, cv=tscv)
+    ridge.fit(X_train_z, y_train)
+    y_pred = pd.Series(ridge.predict(X_test_z), index=test.index)
+
+    # Ridge coefficients don't come with classical p-values (regularization
+    # biases the estimator, so standard-error theory doesn't directly
+    # apply) — the importance table here is coefficient magnitude only.
+    importance = pd.DataFrame({
+        "feature": X_train.columns,
+        "std_coefficient": ridge.coef_,
+        "abs_std_coefficient": np.abs(ridge.coef_),
+    }).sort_values("abs_std_coefficient", ascending=False).reset_index(drop=True)
+
+    return y_pred, ridge, importance
+
+
+# ---------------------------------------------------------------------------
 # ORDER SELECTION — small grid search, scored on held-out validation RMSE
 #
 # AIC alone isn't enough here: it only measures in-sample fit, so it can
@@ -295,7 +401,7 @@ def exog_feature_importance(fit_result, feature_cols: list) -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------------------
-# RUN ONE EXPERIMENT (one training/testing window, all 4 models)
+# RUN ONE EXPERIMENT (one training/testing window, all 5 models)
 # ---------------------------------------------------------------------------
 def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
     label = cfg["label"]
@@ -304,9 +410,8 @@ def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
     train = df.loc[cfg["train_start"]:cfg["train_end"]]
     test = df.loc[cfg["test_start"]:]
 
-    needed_cols = [TARGET] + EXOG_COLS
-    train = train.dropna(subset=needed_cols)
-    test = test.dropna(subset=needed_cols)
+    # Missing rows were already removed globally in load_data(), ensuring
+    # every model is trained and evaluated on the same complete months.
 
     if len(train) < 24:
         print(f"  Only {len(train)} training rows available (need >= 24 for a "
@@ -359,20 +464,28 @@ def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
     print("  [Holt-Winters] Fitting damped-trend exponential smoothing...")
     hw_pred, hw_fit = holt_winters_forecast(train, test, TARGET, SEASONAL_PERIOD)
 
-    # ---------------- 3. Linear trend + seasonality + exog ----------------
+    # ---------------- 3. Linear trend + seasonality + exog (2 indicators) ----------------
     print("  [Linear Trend] Fitting OLS (trend + seasonality + exog)...")
     linear_pred, linear_fit = linear_trend_forecast(train, test, TARGET, EXOG_COLS, SEASONAL_PERIOD)
     linear_feature_cols = ["trend", "month_sin", "month_cos"] + EXOG_COLS
     linear_importance = exog_feature_importance(linear_fit, linear_feature_cols)
 
-    # ---------------- 4. Seasonal naive baseline ----------------
+    # ---------------- 4. Ridge regression + seasonality (7 indicators) ----------------
+    print("  [Ridge] Fitting Ridge regression (trend + seasonality + all socioeconomic indicators)...")
+    ridge_pred, ridge_fit, ridge_importance = ridge_trend_forecast(
+        train, test, TARGET, FULL_EXOG_COLS, SEASONAL_PERIOD
+    )
+    print(f"  [Ridge] Selected alpha={ridge_fit.alpha_:.3f}")
+
+    # ---------------- 5. Seasonal naive baseline ----------------
     naive_pred = seasonal_naive_forecast(train, test, TARGET, SEASONAL_PERIOD)
 
-    # ---------------- metrics for all 4 ----------------
+    # ---------------- metrics for all 5 ----------------
     metrics_by_model = {
         "SARIMAX": compute_metrics(y_test.values, sarimax_pred.values),
         "Holt-Winters (damped)": compute_metrics(y_test.values, hw_pred.values),
         "Linear Trend + Exog": compute_metrics(y_test.values, linear_pred.values),
+        "Ridge (All Socioeconomic Indicators)": compute_metrics(y_test.values, ridge_pred.values),
         "Seasonal Naive": compute_metrics(y_test.values, naive_pred.values),
     }
 
@@ -385,7 +498,7 @@ def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
     print(f"\n  Best model by RMSE: {best_model_name} "
           f"(RMSE={metrics_by_model[best_model_name]['RMSE']:,.2f})")
 
-    # ---- actual vs. predicted plot (all 4 models) ----
+    # ---- actual vs. predicted plot (all 5 models) ----
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(y_train.index, y_train, label="Train (actual)", color="gray")
     ax.plot(y_test.index, y_test, label="Test (actual)", color="black", marker="o", linewidth=2)
@@ -394,6 +507,7 @@ def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
                      color="tab:blue", alpha=0.12, label="SARIMAX 95% CI")
     ax.plot(y_test.index, hw_pred, label="Holt-Winters (damped)", color="tab:green", marker="s")
     ax.plot(y_test.index, linear_pred, label="Linear Trend + Exog", color="tab:red", marker="^")
+    ax.plot(y_test.index, ridge_pred, label="Ridge (All Socioeconomic Indicators)", color="tab:purple", marker="d")
     ax.plot(y_test.index, naive_pred, label="Seasonal Naive", color="tab:orange", linestyle="--")
     ax.set_title(f"Actual vs. Predicted — {label}")
     ax.set_ylabel(TARGET)
@@ -423,13 +537,34 @@ def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
     fig3.savefig(OUTPUT_DIR / f"feature_importance_linear_{key}.png", dpi=150)
     plt.close(fig3)
 
+    # ---- Ridge model feature importance plot ----
+    fig4, ax4 = plt.subplots(figsize=(8, 4))
+    ax4.barh(ridge_importance["feature"], ridge_importance["abs_std_coefficient"], color="tab:purple")
+    ax4.set_xlabel("|Standardized coefficient|")
+    ax4.set_title(f"Ridge Model Feature Importance (All Socioeconomic Indicators) — {label}")
+    ax4.invert_yaxis()
+    fig4.tight_layout()
+    fig4.savefig(OUTPUT_DIR / f"feature_importance_ridge_{key}.png", dpi=150)
+    plt.close(fig4)
+
     sarimax_importance.to_csv(OUTPUT_DIR / f"feature_importance_sarimax_{key}.csv", index=False)
     linear_importance.to_csv(OUTPUT_DIR / f"feature_importance_linear_{key}.csv", index=False)
+    ridge_importance.to_csv(OUTPUT_DIR / f"feature_importance_ridge_{key}.csv", index=False)
 
     with open(OUTPUT_DIR / f"model_summary_sarimax_{key}.txt", "w") as f:
         f.write(str(sarimax_fit.summary()))
     with open(OUTPUT_DIR / f"model_summary_linear_{key}.txt", "w") as f:
         f.write(str(linear_fit.summary()))
+    with open(OUTPUT_DIR / f"model_summary_ridge_{key}.txt", "w") as f:
+        f.write("Ridge Regression (trend + seasonality + all socioeconomic indicators)\n")
+        f.write("=" * 60 + "\n")
+        f.write(f"Selected alpha (via TimeSeriesSplit CV): {ridge_fit.alpha_:.4f}\n\n")
+        f.write("Standardized coefficients:\n")
+        f.write(ridge_importance.to_string(index=False))
+        f.write("\n\n(Note: Ridge coefficients are regularized point estimates, not\n"
+                "classical OLS estimates, so no p-values are reported here — "
+                "regularization biases the estimator in a way that standard\n"
+                "significance testing doesn't directly apply to.)\n")
     with open(OUTPUT_DIR / f"model_summary_holtwinters_{key}.txt", "w") as f:
         params = hw_fit.params
         f.write("Holt-Winters (damped trend) fitted parameters\n")
@@ -447,10 +582,12 @@ def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
         "seasonal_order": seasonal_order,
         "trend": trend,
         "aic": aic,
+        "ridge_alpha": ridge_fit.alpha_,
         "metrics_by_model": metrics_by_model,
         "best_model": best_model_name,
         "sarimax_importance": sarimax_importance,
         "linear_importance": linear_importance,
+        "ridge_importance": ridge_importance,
     }
 
 
@@ -461,7 +598,7 @@ def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
 
     df = load_data(DATA_PATH)
-    missing = [c for c in [TARGET] + EXOG_COLS if c not in df.columns]
+    missing = [c for c in [TARGET] + FULL_EXOG_COLS if c not in df.columns]
     if missing:
         raise ValueError(f"Missing expected columns in {DATA_PATH}: {missing}")
 
@@ -487,6 +624,8 @@ def main():
                 row["seasonal_order"] = str(res["seasonal_order"])
                 row["trend"] = str(res["trend"])
                 row["AIC"] = res["aic"]
+            elif model_name == "Ridge (All Socioeconomic Indicators)":
+                row["ridge_alpha"] = res["ridge_alpha"]
             row.update(metrics)
             row["is_best_in_experiment"] = model_name == res["best_model"]
             comparison_rows.append(row)

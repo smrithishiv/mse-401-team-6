@@ -1,0 +1,20 @@
+Ridge Regression (trend + seasonality + all socioeconomic indicators)
+============================================================
+Selected alpha (via TimeSeriesSplit CV): 0.0728
+
+Standardized coefficients:
+                feature  std_coefficient  abs_std_coefficient
+                  trend     14181.283492         14181.283492
+  ow_beneficiaries_lag1     -2967.442592          2967.442592
+     cpi_all_items_lag1     -2170.219597          2170.219597
+              month_cos     -1390.896076          1390.896076
+ unemployment_rate_lag1     -1323.408671          1323.408671
+odsp_beneficiaries_lag1     -1219.332705          1219.332705
+       cpi_shelter_lag1       698.608866           698.608866
+    total_homeless_lag1       507.566724           507.566724
+              month_sin      -417.362560           417.362560
+          cpi_food_lag1       289.037854           289.037854
+
+(Note: Ridge coefficients are regularized point estimates, not
+classical OLS estimates, so no p-values are reported here — regularization biases the estimator in a way that standard
+significance testing doesn't directly apply to.)

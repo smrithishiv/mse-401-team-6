@@ -1,0 +1,3 @@
+feature,std_coefficient,abs_std_coefficient,p_value,significant_p<0.05
+unemployment_rate_lag1,-2538.952915806431,2538.952915806431,0.0009924345555594278,True
+total_homeless_lag1,-1361.1881235770336,1361.1881235770336,0.1502282043157346,False

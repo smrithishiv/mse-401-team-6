@@ -1,0 +1,29 @@
+                             OLS Regression Results                            
+===============================================================================
+Dep. Variable:     total_people_served   R-squared:                       0.889
+Model:                             OLS   Adj. R-squared:                  0.873
+Method:                  Least Squares   F-statistic:                     57.40
+Date:                 Fri, 31 Jul 2026   Prob (F-statistic):           3.78e-16
+Time:                         07:40:20   Log-Likelihood:                -397.94
+No. Observations:                   42   AIC:                             807.9
+Df Residuals:                       36   BIC:                             818.3
+Df Model:                            5                                         
+Covariance Type:             nonrobust                                         
+==========================================================================================
+                             coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+const                   4.266e+04    525.370     81.199      0.000    4.16e+04    4.37e+04
+trend                   8944.5323   1561.232      5.729      0.000    5778.207    1.21e+04
+month_sin                 71.8119    567.251      0.127      0.900   -1078.626    1222.249
+month_cos              -1085.8520    589.426     -1.842      0.074   -2281.263     109.559
+unemployment_rate_lag1 -2197.9055    964.424     -2.279      0.029   -4153.848    -241.963
+total_homeless_lag1     1792.3483   1191.486      1.504      0.141    -624.097    4208.794
+==============================================================================
+Omnibus:                        3.486   Durbin-Watson:                   2.414
+Prob(Omnibus):                  0.175   Jarque-Bera (JB):                2.299
+Skew:                          -0.485   Prob(JB):                        0.317
+Kurtosis:                       3.612   Cond. No.                         5.94
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
