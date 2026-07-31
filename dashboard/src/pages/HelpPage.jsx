@@ -10,6 +10,9 @@ export default function HelpPage() {
       <p className={styles.projectionsLink}>
         <Link to="/help/projections">How Projections Work →</Link>
       </p>
+      <p className={styles.projectionsLink}>
+        <Link to="/help/risk-index">How the Risk Index Works →</Link>
+      </p>
       <div className={styles.layout}>
         <nav className={styles.toc} aria-label="Table of contents">
           <p className={styles.tocTitle}>On this page</p>

@@ -9,6 +9,7 @@ import AgenciesPage from './pages/AgenciesPage';
 import AgencyDetailPage from './pages/AgencyDetailPage';
 import HelpPage from './pages/HelpPage';
 import HelpProjectionsPage from './pages/HelpProjectionsPage';
+import HelpRiskIndexPage from './pages/HelpRiskIndexPage';
 import ScenarioAnalysisPage from './pages/ScenarioAnalysisPage';
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/scenario-analysis" element={<ScenarioAnalysisPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/help/projections" element={<HelpProjectionsPage />} />
+          <Route path="/help/risk-index" element={<HelpRiskIndexPage />} />
           <Route path="*" element={<Navigate to="/overview" replace />} />
         </Routes>
         <DashboardFooter />

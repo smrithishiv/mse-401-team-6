@@ -1,7 +1,36 @@
+.selectionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bb-blue-bg);
+  border: 1px solid var(--bb-blue);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.clearSelectionButton {
+  border: 1px solid var(--border-color-strong);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+}
+
+.clearSelectionButton:hover {
+  border-color: var(--bb-blue);
+  color: var(--bb-blue-dark);
+}
+
 .metricGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-4);
+  align-items: start;
 }
 
 .twoCol {
@@ -48,6 +77,86 @@
   font-size: 14px;
   text-align: center;
   padding: var(--space-6);
+}
+
+.cardMeta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.panelRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.panelRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.panelRowName {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.panelRowMeta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.panelRowAction {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  border: none;
+  background: none;
+  color: var(--bb-blue-dark);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0;
+}
+
+.panelRowAction:hover {
+  text-decoration: underline;
+}
+
+.regionalDetailPanel {
+  padding: var(--space-5);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
 }
 
 @media (max-width: 900px) {

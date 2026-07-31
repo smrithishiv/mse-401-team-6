@@ -37,6 +37,18 @@ export function usePageFilters({ fields, defaults }) {
     setIsDrawerOpen(false);
   }, [draftFilters]);
 
+  /**
+   * Applies a full filter set immediately, bypassing the draft/apply step —
+   * used when a page-level action (e.g. selecting a high-risk group from an
+   * expandable summary card) should update filters in one click rather than
+   * requiring the drawer to be opened first.
+   */
+  const applyFiltersWith = useCallback((next) => {
+    setDraftFilters(next);
+    setAppliedFilters(next);
+    setIsDrawerOpen(false);
+  }, []);
+
   const resetFilters = useCallback(() => {
     setDraftFilters(defaults);
     setAppliedFilters(defaults);
@@ -61,6 +73,7 @@ export function usePageFilters({ fields, defaults }) {
     closeDrawer,
     setDraftFilter,
     applyFilters,
+    applyFiltersWith,
     resetFilters,
     activeFilterCount,
   };
