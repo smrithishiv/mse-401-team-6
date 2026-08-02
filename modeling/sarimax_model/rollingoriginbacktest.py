@@ -57,7 +57,7 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 # Shared functions and config, imported from sarimax.py so nothing here can
 # silently drift out of sync with how those models are actually defined.
 # ---------------------------------------------------------------------------
-from sarimax import (
+from modeling.sarimax_model.sarimax import (
     DATA_PATH,
     TARGET,
     EXOG_COLS,

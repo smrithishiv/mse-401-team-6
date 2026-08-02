@@ -70,7 +70,7 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 # silently drift out of sync with how those models / that data are actually
 # defined.
 # ---------------------------------------------------------------------------
-from sarimax import (
+from modeling.sarimax_model.sarimax import (
     DATA_PATH,
     TARGET,
     FULL_EXOG_COLS,
