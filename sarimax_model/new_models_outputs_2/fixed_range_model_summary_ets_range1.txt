@@ -1,0 +1,47 @@
+Auto-ETS selected configuration
+==================================================
+error: add
+trend: 'add'
+damped_trend: False
+seasonal: 'add'
+seasonal_periods: 12
+
+                                  ETS Results                                  
+===============================================================================
+Dep. Variable:     total_people_served   No. Observations:                   77
+Model:                        ETS(AAA)   Log Likelihood                -727.558
+Date:                 Sun, 02 Aug 2026   AIC                           1491.115
+Time:                         16:56:06   BIC                           1533.304
+Sample:                     02-01-2019   HQIC                          1507.990
+                          - 06-01-2025   Scale                      9432982.787
+Covariance Type:                approx                                         
+=======================================================================================
+                          coef    std err          z      P>|z|      [0.025      0.975]
+---------------------------------------------------------------------------------------
+smoothing_level         0.3445      0.081      4.267      0.000       0.186       0.503
+smoothing_trend      3.445e-05        nan        nan        nan         nan         nan
+smoothing_seasonal      0.5407      0.145      3.729      0.000       0.257       0.825
+initial_level        1.769e+04   2235.031      7.913      0.000    1.33e+04    2.21e+04
+initial_trend         334.9644     86.280      3.882      0.000     165.859     504.069
+initial_seasonal.0    653.5000   2340.519      0.279      0.780   -3933.834    5240.834
+initial_seasonal.1   4551.7395   2797.179      1.627      0.104    -930.630       1e+04
+initial_seasonal.2   2141.4896   2333.700      0.918      0.359   -2432.479    6715.459
+initial_seasonal.3   3456.1146   2301.552      1.502      0.133   -1054.845    7967.074
+initial_seasonal.4   4315.3958   2356.132      1.832      0.067    -302.538    8933.330
+initial_seasonal.5    943.2188   2371.136      0.398      0.691   -3704.123    5590.561
+initial_seasonal.6   3088.1354   2312.632      1.335      0.182   -1444.540    7620.811
+initial_seasonal.7   3663.3750   2312.414      1.584      0.113    -868.874    8195.624
+initial_seasonal.8   3368.5521   2305.951      1.461      0.144   -1151.029    7888.134
+initial_seasonal.9   4375.8958   2343.478      1.867      0.062    -217.237    8969.029
+initial_seasonal.10   -10.2916   2532.438     -0.004      0.997   -4973.778    4953.195
+initial_seasonal.11          0   2347.262          0      1.000   -4600.550    4600.550
+===================================================================================
+Ljung-Box (Q):                       57.95   Jarque-Bera (JB):                 1.10
+Prob(Q):                              0.00   Prob(JB):                         0.58
+Heteroskedasticity (H):               1.48   Skew:                            -0.28
+Prob(H) (two-sided):                  0.32   Kurtosis:                         2.81
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using numerical (complex-step) differentiation.
+[2] Covariance matrix is singular or near-singular, with condition number 1.55e+16. Standard errors may be unstable.

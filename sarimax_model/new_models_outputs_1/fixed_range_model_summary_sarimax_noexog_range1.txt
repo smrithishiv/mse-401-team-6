@@ -1,0 +1,27 @@
+                                      SARIMAX Results                                       
+============================================================================================
+Dep. Variable:                  total_people_served   No. Observations:                   77
+Model:             SARIMAX(2, 0, 0)x(1, 1, [1], 12)   Log Likelihood                -487.618
+Date:                              Sun, 02 Aug 2026   AIC                            985.237
+Time:                                      18:20:08   BIC                            994.896
+Sample:                                  02-01-2019   HQIC                           988.928
+                                       - 06-01-2025                                         
+Covariance Type:                                opg                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+ar.L1          0.4693      0.186      2.525      0.012       0.105       0.834
+ar.L2          0.4898      0.160      3.053      0.002       0.175       0.804
+ar.S.L12       0.3652      0.361      1.010      0.312      -0.343       1.074
+ma.S.L12      -0.6430      0.276     -2.330      0.020      -1.184      -0.102
+sigma2      1.196e+07   1.55e-08   7.73e+14      0.000     1.2e+07     1.2e+07
+===================================================================================
+Ljung-Box (L1) (Q):                   3.51   Jarque-Bera (JB):                 2.23
+Prob(Q):                              0.06   Prob(JB):                         0.33
+Heteroskedasticity (H):               2.00   Skew:                            -0.44
+Prob(H) (two-sided):                  0.16   Kurtosis:                         2.47
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).
+[2] Covariance matrix is singular or near-singular, with condition number 9.09e+30. Standard errors may be unstable.

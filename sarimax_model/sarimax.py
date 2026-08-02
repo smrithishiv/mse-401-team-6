@@ -63,6 +63,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import TimeSeriesSplit
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from statsmodels.tsa.exponential_smoothing.ets import ETSModel
 
 warnings.filterwarnings("ignore")
 
@@ -206,6 +207,38 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# TRAIN-SET (IN-SAMPLE) RMSE — for reading off overfitting/underfitting:
+# Train_RMSE << test RMSE means the model fit the training window closely
+# but didn't generalize (overfitting); both high means it didn't even fit
+# its own training data well (underfitting). fitted may have leading NaNs
+# (e.g. ARIMA differencing eats the first few observations), so align and
+# drop them before scoring rather than letting them propagate to NaN RMSE.
+# ---------------------------------------------------------------------------
+def train_rmse(y_train: pd.Series, fitted: pd.Series) -> float:
+    aligned = pd.concat([y_train.rename("actual"), fitted.rename("fitted")], axis=1).dropna()
+    if aligned.empty:
+        return np.nan
+    return np.sqrt(mean_squared_error(aligned["actual"], aligned["fitted"]))
+
+
+# ---------------------------------------------------------------------------
+# STD-DEV OF PER-ORIGIN WAPE — a variance/stability signal distinct from the
+# pooled WAPE in compute_metrics(): a model can have a low pooled WAPE but
+# swing wildly from one rolling origin to the next (high variance / very
+# sensitive to which window it happened to be trained on), which the pooled
+# number alone can't reveal. df must have "origin", "actual", "predicted"
+# columns (the raw rolling-backtest record format used by every rolling
+# script in this project).
+# ---------------------------------------------------------------------------
+def wape_std_across_origins(df: pd.DataFrame) -> float:
+    per_origin_wape = df.groupby("origin").apply(
+        lambda g: np.sum(np.abs(g["actual"] - g["predicted"])) / np.sum(np.abs(g["actual"])) * 100,
+        include_groups=False,
+    )
+    return per_origin_wape.std()
+
+
+# ---------------------------------------------------------------------------
 # SEASONAL NAIVE BASELINE (this month = same month last year)
 # ---------------------------------------------------------------------------
 def seasonal_naive_forecast(train: pd.DataFrame, test: pd.DataFrame,
@@ -216,6 +249,17 @@ def seasonal_naive_forecast(train: pd.DataFrame, test: pd.DataFrame,
         ref_date = date - pd.DateOffset(months=period)
         preds.append(history.get(ref_date, train[target].iloc[-1]))
     return pd.Series(preds, index=test.index)
+
+
+# ---------------------------------------------------------------------------
+# NAIVE BASELINE (persistence: forecast = last observed value, repeated for
+# every step of the horizon) — no seasonality, no exogenous inputs. Distinct
+# from seasonal_naive_forecast() above, which uses the same month last year
+# instead of the most recent month.
+# ---------------------------------------------------------------------------
+def naive_forecast(train: pd.DataFrame, test: pd.DataFrame, target: str) -> pd.Series:
+    last_value = train[target].iloc[-1]
+    return pd.Series([last_value] * len(test), index=test.index)
 
 
 # ---------------------------------------------------------------------------
@@ -312,6 +356,7 @@ def ridge_trend_forecast(train: pd.DataFrame, test: pd.DataFrame, target: str,
     ridge = RidgeCV(alphas=alphas, cv=tscv)
     ridge.fit(X_train_z, y_train)
     y_pred = pd.Series(ridge.predict(X_test_z), index=test.index)
+    train_pred = pd.Series(ridge.predict(X_train_z), index=train.index)
 
     # Ridge coefficients don't come with classical p-values (regularization
     # biases the estimator, so standard-error theory doesn't directly
@@ -322,7 +367,7 @@ def ridge_trend_forecast(train: pd.DataFrame, test: pd.DataFrame, target: str,
         "abs_std_coefficient": np.abs(ridge.coef_),
     }).sort_values("abs_std_coefficient", ascending=False).reset_index(drop=True)
 
-    return y_pred, ridge, importance
+    return y_pred, ridge, importance, train_pred
 
 
 # ---------------------------------------------------------------------------
@@ -340,7 +385,10 @@ def grid_search_sarimax(y: pd.Series, exog: pd.DataFrame, seasonal_period: int,
                          validation_size: int = 12):
     n_val = min(validation_size, max(len(y) // 4, 1))
     y_fit, y_val = y.iloc[:-n_val], y.iloc[-n_val:]
-    exog_fit, exog_val = exog.iloc[:-n_val], exog.iloc[-n_val:]
+    if exog is not None:
+        exog_fit, exog_val = exog.iloc[:-n_val], exog.iloc[-n_val:]
+    else:
+        exog_fit, exog_val = None, None
 
     best_rmse = np.inf
     best_order = None
@@ -374,6 +422,67 @@ def grid_search_sarimax(y: pd.Series, exog: pd.DataFrame, seasonal_period: int,
         # fallback if every candidate failed to converge
         best_order, best_seasonal_order, best_trend = (1, 1, 1), (0, 0, 0, seasonal_period), None
     return best_order, best_seasonal_order, best_trend, best_rmse
+
+
+# ---------------------------------------------------------------------------
+# AUTO-ETS ORDER SELECTION — small grid search over trend/damping/seasonal
+# component combinations, scored on held-out validation RMSE (same procedure
+# as grid_search_sarimax above). Error is fixed to additive: Holt-Winters
+# (damped additive trend, additive seasonal) is one specific point in this
+# grid, so this searches the wider ETS family around it rather than assuming
+# damped trend is the right choice.
+# ---------------------------------------------------------------------------
+def grid_search_ets(y: pd.Series, seasonal_period: int, validation_size: int = 12):
+    n_val = min(validation_size, max(len(y) // 4, 1))
+    y_fit, y_val = y.iloc[:-n_val], y.iloc[-n_val:]
+
+    trend_options = (None, "add")
+    seasonal_options = (None, "add") if len(y_fit) >= 2 * seasonal_period + 1 else (None,)
+
+    best_rmse = np.inf
+    best_trend = None
+    best_damped = False
+    best_seasonal = None
+    for trend in trend_options:
+        damped_options = (False, True) if trend is not None else (False,)
+        for damped in damped_options:
+            for seasonal in seasonal_options:
+                try:
+                    model = ETSModel(
+                        y_fit, error="add", trend=trend, damped_trend=damped,
+                        seasonal=seasonal,
+                        seasonal_periods=seasonal_period if seasonal else None,
+                    )
+                    fit = model.fit(disp=False)
+                    pred = fit.forecast(n_val)
+                    if not np.all(np.isfinite(pred)):
+                        continue
+                    rmse = np.sqrt(mean_squared_error(y_val, pred))
+                    if rmse < best_rmse:
+                        best_rmse = rmse
+                        best_trend, best_damped, best_seasonal = trend, damped, seasonal
+                except Exception:
+                    continue
+    if best_trend is None and best_seasonal is None and best_rmse == np.inf:
+        # fallback if every candidate failed to converge
+        best_trend, best_damped, best_seasonal, best_rmse = "add", True, None, np.nan
+    return best_trend, best_damped, best_seasonal, best_rmse
+
+
+# ---------------------------------------------------------------------------
+# AUTO-ETS forecast with a FIXED (already-chosen) configuration.
+# ---------------------------------------------------------------------------
+def ets_forecast(train: pd.DataFrame, test: pd.DataFrame, target: str, seasonal_period: int,
+                  trend, damped: bool, seasonal):
+    y_train = train[target]
+    model = ETSModel(
+        y_train, error="add", trend=trend, damped_trend=damped if trend is not None else False,
+        seasonal=seasonal, seasonal_periods=seasonal_period if seasonal else None,
+    )
+    fit = model.fit(disp=False)
+    pred = fit.forecast(len(test))
+    pred.index = test.index
+    return pred, fit
 
 
 # ---------------------------------------------------------------------------
@@ -472,7 +581,7 @@ def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
 
     # ---------------- 4. Ridge regression + seasonality (7 indicators) ----------------
     print("  [Ridge] Fitting Ridge regression (trend + seasonality + all socioeconomic indicators)...")
-    ridge_pred, ridge_fit, ridge_importance = ridge_trend_forecast(
+    ridge_pred, ridge_fit, ridge_importance, ridge_train_pred = ridge_trend_forecast(
         train, test, TARGET, FULL_EXOG_COLS, SEASONAL_PERIOD
     )
     print(f"  [Ridge] Selected alpha={ridge_fit.alpha_:.3f}")
@@ -488,6 +597,27 @@ def run_experiment(df: pd.DataFrame, key: str, cfg: dict):
         "Ridge (All Socioeconomic Indicators)": compute_metrics(y_test.values, ridge_pred.values),
         "Seasonal Naive": compute_metrics(y_test.values, naive_pred.values),
     }
+
+    # ---------------- train-set (in-sample) RMSE, for reading off
+    # overfitting/underfitting: Train_RMSE far below test RMSE means the
+    # model fit its training window closely but didn't generalize; both
+    # high means it didn't even fit training data well. Seasonal Naive has
+    # no fitted parameters to overfit/underfit with, so it's left NaN.
+    # ---------------------------------------------------------------------
+    train_rmse_by_model = {
+        "SARIMAX": train_rmse(y_train, sarimax_fit.fittedvalues),
+        "Holt-Winters (damped)": train_rmse(y_train, hw_fit.fittedvalues),
+        "Linear Trend + Exog": train_rmse(y_train, linear_fit.fittedvalues),
+        "Ridge (All Socioeconomic Indicators)": train_rmse(y_train, ridge_train_pred),
+        "Seasonal Naive": np.nan,
+    }
+    for model_name, m in metrics_by_model.items():
+        m["Train_RMSE"] = train_rmse_by_model[model_name]
+        m["Overfit_Gap_%"] = (
+            (m["RMSE"] - m["Train_RMSE"]) / m["Train_RMSE"] * 100
+            if np.isfinite(m["Train_RMSE"]) and m["Train_RMSE"] > 0
+            else np.nan
+        )
 
     print()
     for model_name, metrics in metrics_by_model.items():

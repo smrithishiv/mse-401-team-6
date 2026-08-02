@@ -65,7 +65,9 @@ from sarimax import (
     SEASONAL_PERIOD,
     load_data,
     compute_metrics,
+    wape_std_across_origins,
     seasonal_naive_forecast,
+    naive_forecast,
     holt_winters_forecast,
     linear_trend_forecast,
     ridge_trend_forecast,
@@ -185,14 +187,16 @@ def run_rolling_origin_backtest(df: pd.DataFrame, sarimax_order: tuple,
 
         hw_pred, _ = holt_winters_forecast(train, test, TARGET, SEASONAL_PERIOD)
         linear_pred, _ = linear_trend_forecast(train, test, TARGET, EXOG_COLS, SEASONAL_PERIOD)
-        ridge_pred, _, _ = ridge_trend_forecast(train, test, TARGET, FULL_EXOG_COLS, SEASONAL_PERIOD)
-        naive_pred = seasonal_naive_forecast(train, test, TARGET, SEASONAL_PERIOD)
+        ridge_pred, _, _, _ = ridge_trend_forecast(train, test, TARGET, FULL_EXOG_COLS, SEASONAL_PERIOD)
+        seasonal_naive_pred = seasonal_naive_forecast(train, test, TARGET, SEASONAL_PERIOD)
+        naive_pred = naive_forecast(train, test, TARGET)
 
         preds_by_model = {
             "Holt-Winters (damped)": hw_pred,
             "Linear Trend + Exog": linear_pred,
             "Ridge (All Socioeconomic Indicators)": ridge_pred,
-            "Seasonal Naive": naive_pred,
+            "Seasonal Naive": seasonal_naive_pred,
+            "Naive": naive_pred,
         }
         # SARIMAX only included for this origin if its forecast passed the
         # sanity check — an unstable origin is excluded from SARIMAX's own
@@ -239,9 +243,10 @@ def run_rolling_origin_backtest(df: pd.DataFrame, sarimax_order: tuple,
         m["model"] = model_name
         m["horizon"] = h
         m["n_origins"] = len(group)
+        m["WAPE_std_%"] = wape_std_across_origins(group)
         summary_rows.append(m)
     summary_df = pd.DataFrame(summary_rows)[
-        ["model", "horizon", "n_origins", "MAE", "RMSE", "WAPE_%", "Bias", "R2"]
+        ["model", "horizon", "n_origins", "MAE", "RMSE", "WAPE_%", "WAPE_std_%", "Bias", "R2"]
     ].sort_values(["horizon", "WAPE_%"]).reset_index(drop=True)
     summary_df.to_csv(OUTPUT_DIR / "rolling_backtest_summary.csv", index=False)
 
@@ -254,9 +259,10 @@ def run_rolling_origin_backtest(df: pd.DataFrame, sarimax_order: tuple,
         m = compute_metrics(group["actual"].values, group["predicted"].values)
         m["model"] = model_name
         m["n_forecasts"] = len(group)
+        m["WAPE_std_%"] = wape_std_across_origins(group)
         overall_rows.append(m)
     overall_df = pd.DataFrame(overall_rows)[
-        ["model", "n_forecasts", "MAE", "RMSE", "WAPE_%", "Bias", "R2"]
+        ["model", "n_forecasts", "MAE", "RMSE", "WAPE_%", "WAPE_std_%", "Bias", "R2"]
     ].sort_values("WAPE_%").reset_index(drop=True)
     overall_df.to_csv(OUTPUT_DIR / "rolling_backtest_overall.csv", index=False)
 
@@ -268,7 +274,7 @@ def run_rolling_origin_backtest(df: pd.DataFrame, sarimax_order: tuple,
     colors = {
         "SARIMAX": "tab:blue", "Holt-Winters (damped)": "tab:green",
         "Linear Trend + Exog": "tab:red", "Ridge (All Socioeconomic Indicators)": "tab:purple",
-        "Seasonal Naive": "tab:orange",
+        "Seasonal Naive": "tab:orange", "Naive": "tab:brown",
     }
     for model_name in summary_df["model"].unique():
         sub = summary_df[summary_df["model"] == model_name].sort_values("horizon")
