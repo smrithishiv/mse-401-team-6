@@ -40,18 +40,22 @@
 
 .risk-low {
   fill: var(--risk-low);
+  background-color: var(--risk-low);
 }
 
 .risk-medium {
   fill: var(--risk-medium);
+  background-color: var(--risk-medium);
 }
 
 .risk-med-high {
   fill: var(--risk-med-high);
+  background-color: var(--risk-med-high);
 }
 
 .risk-high {
   fill: var(--risk-high);
+  background-color: var(--risk-high);
 }
 
 .regionLabel {

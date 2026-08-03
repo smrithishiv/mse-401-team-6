@@ -85,7 +85,6 @@ export default function OverviewPage() {
               {data.summary.predictedDemand.confidence && (
                 <span className={styles.heroBadgeRow}>
                   <ConfidenceBadge level={data.summary.predictedDemand.confidence} />
-                  <InfoTooltip content="High confidence means the predicted range is within ±5% of the forecast, so it can generally be used without manual confirmation. Below that it's flagged low and needs manual confirmation." />
                 </span>
               )}
               {data.summary.predictedDemand.isActual && <StatusBadge status="Actual" tone="grey" />}
