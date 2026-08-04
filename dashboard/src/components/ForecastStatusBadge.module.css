@@ -1,11 +1,14 @@
 .wrap {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .badgeRow {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
+  min-width: 0;
 }

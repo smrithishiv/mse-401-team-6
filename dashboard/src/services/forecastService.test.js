@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   getOperationalForecast,
   getOperationalForecastWeekly,
@@ -7,6 +7,23 @@ import {
   getDriverExplanations,
   getModelStatus,
 } from './forecastService';
+import { __resetRealForecastCacheForTests } from './realForecastData';
+
+const REAL_EXPORT = {
+  model: 'Holt-Winters',
+  modelStatus: 'Provisional operational recommendation',
+  modelStatusNote: 'Provisional — other candidate models are still being evaluated.',
+  generatedAt: '2026-08-01T12:00:00+00:00',
+  historical: [
+    { date: '2026-05', actual: 51000 },
+    { date: '2026-06', actual: 52000 },
+  ],
+  forecast: [
+    { date: '2026-07', horizonMonths: 1, value: 53000, lowerBound: 50000, upperBound: 56000 },
+    { date: '2026-08', horizonMonths: 2, value: 54000, lowerBound: 50500, upperBound: 57500 },
+    { date: '2026-09', horizonMonths: 3, value: 55000, lowerBound: 51000, upperBound: 59000 },
+  ],
+};
 
 describe('forecastService', () => {
   it('resolves operational forecast values matching the mock data contract', async () => {
@@ -106,5 +123,51 @@ describe('forecastService', () => {
     expect(status.operationalForecast.generatedAt).not.toBe(status.strategicForecast.generatedAt);
     expect(status.operationalForecast.refreshCadence).toBe('weekly');
     expect(status.strategicForecast.refreshCadence).toBe('quarterly');
+  });
+});
+
+describe('forecastService — real Holt-Winters export path', () => {
+  beforeEach(() => {
+    __resetRealForecastCacheForTests();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('uses the real export (1/2/3-month-ahead forecasts, in order) when the file is available', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => REAL_EXPORT });
+
+    const data = await getOperationalForecast({});
+    const predicted = data.months.filter((m) => m.type === 'predicted');
+
+    expect(data.isSampleData).toBe(false);
+    expect(data.model).toBe('Holt-Winters');
+    expect(predicted.map((m) => m.isoMonth)).toEqual(['2026-07', '2026-08', '2026-09']);
+    expect(predicted.map((m) => m.value)).toEqual([53000, 54000, 55000]);
+    expect(predicted.every((m) => m.confidence === 'pending')).toBe(true);
+  });
+
+  it('falls back to sample data (tagged isSampleData) when the export file is unavailable', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 404 });
+
+    const data = await getOperationalForecast({});
+
+    expect(data.isSampleData).toBe(true);
+    expect(data.months.length).toBeGreaterThan(0);
+  });
+
+  it('still applies demographic-filter scaling on top of real forecast values', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => REAL_EXPORT });
+
+    const unfiltered = await getOperationalForecast({});
+    __resetRealForecastCacheForTests();
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => REAL_EXPORT });
+    const filtered = await getOperationalForecast({ gender: 'male' });
+
+    const unfilteredJuly = unfiltered.months.find((m) => m.isoMonth === '2026-07').value;
+    const filteredJuly = filtered.months.find((m) => m.isoMonth === '2026-07').value;
+
+    expect(filteredJuly).toBeLessThan(unfilteredJuly);
   });
 });

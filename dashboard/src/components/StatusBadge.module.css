@@ -9,6 +9,21 @@
   text-transform: capitalize;
 }
 
+/*
+ * Opt-in modifier (StatusBadge's `wrap` prop) for contexts with long,
+ * model-generated labels and enough vertical room to wrap onto a second
+ * line — currently only the Forecast page's monthly cards. Everywhere else
+ * (agency/table status pills, socioeconomic signal cards, etc.) keeps the
+ * plain nowrap `.badge` above: those render in narrow table cells/rows
+ * where a shrinkable, wrappable pill collapses to one character per line
+ * instead of wrapping cleanly.
+ */
+.badgeWrap {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
 .red {
   background: var(--bb-red-bg);
   color: var(--bb-red);

@@ -1,17 +1,25 @@
 /**
- * Mock data backing the Overview page. Agency-level data (used to be a
- * separate `agencyAlerts` export here) now lives in `mockAgencyData.js` /
- * `agencyService.js` — Overview's review queue reads from there so there is
- * one source of truth for agency data across Overview and the Agencies page.
+ * Mock/fallback data backing the Overview page. Agency-level data (used to
+ * be a separate `agencyAlerts` export here) now lives in `mockAgencyData.js`
+ * / `agencyService.js` — Overview's review queue reads from there so there
+ * is one source of truth for agency data across Overview and the Agencies
+ * page.
+ *
+ * Snapshot keys are the generic 'current'/'previous' period identifiers
+ * (not specific calendar months) so the same two keys work whether
+ * overviewService is serving this mock data or the real Holt-Winters
+ * export (see utils/realForecastAdapter.js) — a real forecast's "current"
+ * period isn't always a fixed month, so the period selector can't hardcode
+ * one.
  */
 
 export const OVERVIEW_REPORTING_PERIOD_OPTIONS = [
-  { value: 'aug-2026', label: 'August 2026 (predicted)' },
-  { value: 'jul-2026', label: 'July 2026 (actual)' },
+  { value: 'current', label: 'Current period (predicted)' },
+  { value: 'previous', label: 'Previous period (actual)' },
 ];
 
 const overviewSnapshots = {
-  'aug-2026': {
+  current: {
     predictedDemand: {
       monthLabel: 'August 2026',
       value: 54200,
@@ -34,7 +42,7 @@ const overviewSnapshots = {
       { id: 'seniors', label: 'Seniors (65+)', changePct: 44 },
     ],
   },
-  'jul-2026': {
+  previous: {
     predictedDemand: {
       monthLabel: 'July 2026',
       value: 51840,
@@ -59,6 +67,6 @@ const overviewSnapshots = {
 };
 
 /** @param {string} period */
-export function getOverviewSnapshot(period = 'aug-2026') {
-  return overviewSnapshots[period] || overviewSnapshots['aug-2026'];
+export function getOverviewSnapshot(period = 'current') {
+  return overviewSnapshots[period] || overviewSnapshots.current;
 }

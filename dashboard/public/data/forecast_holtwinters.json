@@ -1,0 +1,610 @@
+{
+  "model": "Holt-Winters",
+  "modelStatus": "Provisional operational recommendation",
+  "modelStatusNote": "Current operational model while other candidates (Naive, SARIMAX, Random Forest, GAM) are still being evaluated. Not designated as the final model.",
+  "generatedAt": "2026-08-03T23:20:51+00:00",
+  "metric": "total_people_served",
+  "config": {
+    "trend": "add",
+    "seasonal": "add",
+    "dampedTrend": true,
+    "seasonalPeriods": 12,
+    "trainStart": "2019-01",
+    "trainEnd": "2026-06"
+  },
+  "interval": {
+    "level": 0.8,
+    "method": "simulation",
+    "nSimulations": 1000
+  },
+  "backtest": {
+    "trainRange": {
+      "start": "2019-01",
+      "end": "2025-06"
+    },
+    "testRange": {
+      "start": "2025-07",
+      "end": "2026-06"
+    },
+    "wapePct": 4.76,
+    "r2": 0.086,
+    "note": "From holt_winters_model.ipynb's TR1 backtest of this config; not recomputed by this script."
+  },
+  "historical": [
+    {
+      "date": "2015-01",
+      "actual": 2205
+    },
+    {
+      "date": "2015-02",
+      "actual": 2673
+    },
+    {
+      "date": "2015-03",
+      "actual": 10000
+    },
+    {
+      "date": "2015-04",
+      "actual": 9753
+    },
+    {
+      "date": "2015-05",
+      "actual": 10421
+    },
+    {
+      "date": "2015-06",
+      "actual": 11646
+    },
+    {
+      "date": "2015-07",
+      "actual": 10505
+    },
+    {
+      "date": "2015-08",
+      "actual": 11441
+    },
+    {
+      "date": "2015-09",
+      "actual": 12250
+    },
+    {
+      "date": "2015-10",
+      "actual": 12924
+    },
+    {
+      "date": "2015-11",
+      "actual": 14144
+    },
+    {
+      "date": "2015-12",
+      "actual": 13395
+    },
+    {
+      "date": "2016-01",
+      "actual": 14416
+    },
+    {
+      "date": "2016-02",
+      "actual": 15001
+    },
+    {
+      "date": "2016-03",
+      "actual": 16438
+    },
+    {
+      "date": "2016-04",
+      "actual": 16337
+    },
+    {
+      "date": "2016-05",
+      "actual": 17119
+    },
+    {
+      "date": "2016-06",
+      "actual": 17472
+    },
+    {
+      "date": "2016-07",
+      "actual": 13778
+    },
+    {
+      "date": "2016-08",
+      "actual": 15241
+    },
+    {
+      "date": "2016-09",
+      "actual": 15250
+    },
+    {
+      "date": "2016-10",
+      "actual": 14213
+    },
+    {
+      "date": "2016-11",
+      "actual": 18322
+    },
+    {
+      "date": "2016-12",
+      "actual": 15517
+    },
+    {
+      "date": "2017-01",
+      "actual": 15226
+    },
+    {
+      "date": "2017-02",
+      "actual": 15787
+    },
+    {
+      "date": "2017-03",
+      "actual": 17608
+    },
+    {
+      "date": "2017-04",
+      "actual": 14204
+    },
+    {
+      "date": "2017-05",
+      "actual": 16460
+    },
+    {
+      "date": "2017-06",
+      "actual": 16807
+    },
+    {
+      "date": "2017-07",
+      "actual": 15066
+    },
+    {
+      "date": "2017-08",
+      "actual": 17643
+    },
+    {
+      "date": "2017-09",
+      "actual": 15208
+    },
+    {
+      "date": "2017-10",
+      "actual": 15042
+    },
+    {
+      "date": "2017-11",
+      "actual": 20562
+    },
+    {
+      "date": "2017-12",
+      "actual": 14715
+    },
+    {
+      "date": "2018-01",
+      "actual": 16454
+    },
+    {
+      "date": "2018-02",
+      "actual": 15284
+    },
+    {
+      "date": "2018-03",
+      "actual": 16676
+    },
+    {
+      "date": "2018-04",
+      "actual": 15171
+    },
+    {
+      "date": "2018-05",
+      "actual": 16933
+    },
+    {
+      "date": "2018-06",
+      "actual": 15122
+    },
+    {
+      "date": "2018-07",
+      "actual": 15514
+    },
+    {
+      "date": "2018-08",
+      "actual": 17136
+    },
+    {
+      "date": "2018-09",
+      "actual": 14976
+    },
+    {
+      "date": "2018-10",
+      "actual": 16940
+    },
+    {
+      "date": "2018-11",
+      "actual": 20868
+    },
+    {
+      "date": "2018-12",
+      "actual": 14797
+    },
+    {
+      "date": "2019-01",
+      "actual": 17755
+    },
+    {
+      "date": "2019-02",
+      "actual": 15168
+    },
+    {
+      "date": "2019-03",
+      "actual": 17519
+    },
+    {
+      "date": "2019-04",
+      "actual": 16438
+    },
+    {
+      "date": "2019-05",
+      "actual": 19111
+    },
+    {
+      "date": "2019-06",
+      "actual": 16486
+    },
+    {
+      "date": "2019-07",
+      "actual": 17855
+    },
+    {
+      "date": "2019-08",
+      "actual": 18604
+    },
+    {
+      "date": "2019-09",
+      "actual": 17364
+    },
+    {
+      "date": "2019-10",
+      "actual": 19534
+    },
+    {
+      "date": "2019-11",
+      "actual": 21844
+    },
+    {
+      "date": "2019-12",
+      "actual": 15984
+    },
+    {
+      "date": "2020-01",
+      "actual": 20383
+    },
+    {
+      "date": "2020-02",
+      "actual": 18625
+    },
+    {
+      "date": "2020-03",
+      "actual": 18364
+    },
+    {
+      "date": "2020-04",
+      "actual": 22081
+    },
+    {
+      "date": "2020-05",
+      "actual": 21855
+    },
+    {
+      "date": "2020-06",
+      "actual": 22282
+    },
+    {
+      "date": "2020-07",
+      "actual": 21884
+    },
+    {
+      "date": "2020-08",
+      "actual": 20010
+    },
+    {
+      "date": "2020-09",
+      "actual": 23378
+    },
+    {
+      "date": "2020-10",
+      "actual": 25393
+    },
+    {
+      "date": "2020-11",
+      "actual": 24984
+    },
+    {
+      "date": "2020-12",
+      "actual": 22750
+    },
+    {
+      "date": "2021-01",
+      "actual": 23743
+    },
+    {
+      "date": "2021-02",
+      "actual": 25061
+    },
+    {
+      "date": "2021-03",
+      "actual": 30229
+    },
+    {
+      "date": "2021-04",
+      "actual": 27723
+    },
+    {
+      "date": "2021-05",
+      "actual": 26961
+    },
+    {
+      "date": "2021-06",
+      "actual": 28912
+    },
+    {
+      "date": "2021-07",
+      "actual": 28025
+    },
+    {
+      "date": "2021-08",
+      "actual": 30224
+    },
+    {
+      "date": "2021-09",
+      "actual": 31899
+    },
+    {
+      "date": "2021-10",
+      "actual": 29641
+    },
+    {
+      "date": "2021-11",
+      "actual": 29315
+    },
+    {
+      "date": "2021-12",
+      "actual": 26427
+    },
+    {
+      "date": "2022-01",
+      "actual": 21413
+    },
+    {
+      "date": "2022-02",
+      "actual": 24719
+    },
+    {
+      "date": "2022-03",
+      "actual": 31052
+    },
+    {
+      "date": "2022-04",
+      "actual": 27436
+    },
+    {
+      "date": "2022-05",
+      "actual": 29218
+    },
+    {
+      "date": "2022-06",
+      "actual": 33199
+    },
+    {
+      "date": "2022-07",
+      "actual": 30405
+    },
+    {
+      "date": "2022-08",
+      "actual": 33811
+    },
+    {
+      "date": "2022-09",
+      "actual": 34266
+    },
+    {
+      "date": "2022-10",
+      "actual": 33128
+    },
+    {
+      "date": "2022-11",
+      "actual": 37554
+    },
+    {
+      "date": "2022-12",
+      "actual": 33209
+    },
+    {
+      "date": "2023-01",
+      "actual": 34802
+    },
+    {
+      "date": "2023-02",
+      "actual": 36525
+    },
+    {
+      "date": "2023-03",
+      "actual": 43131
+    },
+    {
+      "date": "2023-04",
+      "actual": 38065
+    },
+    {
+      "date": "2023-05",
+      "actual": 44803
+    },
+    {
+      "date": "2023-06",
+      "actual": 44020
+    },
+    {
+      "date": "2023-07",
+      "actual": 36637
+    },
+    {
+      "date": "2023-08",
+      "actual": 47222
+    },
+    {
+      "date": "2023-09",
+      "actual": 42819
+    },
+    {
+      "date": "2023-10",
+      "actual": 46159
+    },
+    {
+      "date": "2023-11",
+      "actual": 49783
+    },
+    {
+      "date": "2023-12",
+      "actual": 39378
+    },
+    {
+      "date": "2024-01",
+      "actual": 45630
+    },
+    {
+      "date": "2024-02",
+      "actual": 48612
+    },
+    {
+      "date": "2024-03",
+      "actual": 48339
+    },
+    {
+      "date": "2024-04",
+      "actual": 51279
+    },
+    {
+      "date": "2024-05",
+      "actual": 54405
+    },
+    {
+      "date": "2024-06",
+      "actual": 48786
+    },
+    {
+      "date": "2024-07",
+      "actual": 48010
+    },
+    {
+      "date": "2024-08",
+      "actual": 52238
+    },
+    {
+      "date": "2024-09",
+      "actual": 49458
+    },
+    {
+      "date": "2024-10",
+      "actual": 57737
+    },
+    {
+      "date": "2024-11",
+      "actual": 53699
+    },
+    {
+      "date": "2024-12",
+      "actual": 40773
+    },
+    {
+      "date": "2025-01",
+      "actual": 51609
+    },
+    {
+      "date": "2025-02",
+      "actual": 48426
+    },
+    {
+      "date": "2025-03",
+      "actual": 53142
+    },
+    {
+      "date": "2025-04",
+      "actual": 55425
+    },
+    {
+      "date": "2025-05",
+      "actual": 55560
+    },
+    {
+      "date": "2025-06",
+      "actual": 55816
+    },
+    {
+      "date": "2025-07",
+      "actual": 57442
+    },
+    {
+      "date": "2025-08",
+      "actual": 52818
+    },
+    {
+      "date": "2025-09",
+      "actual": 53545
+    },
+    {
+      "date": "2025-10",
+      "actual": 60473
+    },
+    {
+      "date": "2025-11",
+      "actual": 55296
+    },
+    {
+      "date": "2025-12",
+      "actual": 53924
+    },
+    {
+      "date": "2026-01",
+      "actual": 51231
+    },
+    {
+      "date": "2026-02",
+      "actual": 53193
+    },
+    {
+      "date": "2026-03",
+      "actual": 59298
+    },
+    {
+      "date": "2026-04",
+      "actual": 60647
+    },
+    {
+      "date": "2026-05",
+      "actual": 55440
+    },
+    {
+      "date": "2026-06",
+      "actual": 57409
+    }
+  ],
+  "forecast": [
+    {
+      "date": "2026-07",
+      "horizonMonths": 1,
+      "value": 56163,
+      "lowerBound": 52484,
+      "upperBound": 60022
+    },
+    {
+      "date": "2026-08",
+      "horizonMonths": 2,
+      "value": 57838,
+      "lowerBound": 54112,
+      "upperBound": 62184
+    },
+    {
+      "date": "2026-09",
+      "horizonMonths": 3,
+      "value": 57230,
+      "lowerBound": 52369,
+      "upperBound": 62220
+    }
+  ]
+}

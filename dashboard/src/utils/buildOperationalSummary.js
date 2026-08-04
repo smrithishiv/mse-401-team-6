@@ -9,10 +9,10 @@ import { formatNumber } from './format';
  *
  * @param {{
  *   currentForecast?: { monthLabel: string, value: number },
- *   currentConfidence?: 'high' | 'low',
+ *   currentConfidence?: 'high' | 'low' | 'pending',
  *   allocationRecommendation?: string,
  *   agencyAlerts?: Array<{ reviewRequired: boolean, status: string }>,
- *   nextMonthForecast?: { monthLabel: string, value: number, confidence: 'high' | 'low' },
+ *   nextMonthForecast?: { monthLabel: string, value: number, confidence: 'high' | 'low' | 'pending' },
  *   populationSignals?: Array<{ label: string, changePct: number }>,
  * }} input
  * @returns {Array<{ id: string, severity: 'success'|'warning'|'critical'|'info', message: string, destination: string }>}
@@ -70,12 +70,18 @@ export function buildOperationalSummary({
   }
 
   if (nextMonthForecast) {
-    const isLow = nextMonthForecast.confidence === 'low';
     const monthParam = nextMonthForecast.isoMonth ? `?month=${nextMonthForecast.isoMonth}` : '';
+    // 'pending' means no calibrated high/low threshold exists yet — must
+    // never be folded into "low" or "high" here, since that would state a
+    // confidence judgement the model hasn't actually made.
+    const isPending = nextMonthForecast.confidence === 'pending';
+    const isLow = nextMonthForecast.confidence === 'low';
     items.push({
       id: 'next-month-confidence',
-      severity: isLow ? 'warning' : 'success',
-      message: `${nextMonthForecast.monthLabel} forecast confidence is ${isLow ? 'low' : 'high'}.`,
+      severity: isPending ? 'info' : isLow ? 'warning' : 'success',
+      message: isPending
+        ? `${nextMonthForecast.monthLabel} forecast confidence has not been calibrated yet.`
+        : `${nextMonthForecast.monthLabel} forecast confidence is ${isLow ? 'low' : 'high'}.`,
       destination: `/forecast${monthParam}`,
     });
   }

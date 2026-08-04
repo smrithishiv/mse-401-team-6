@@ -97,7 +97,13 @@
 
 .twoCol {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
+  /* Bare `fr` tracks default to a min size of their content's min-content,
+     not 0 — so the wide, nowrap-heavy agency table on the right was
+     dominating and squeezing the population-signals column on the left down
+     to near-nothing regardless of the 1:1.6 ratio. minmax(0, Nfr) makes the
+     ratio actually hold; the table already scrolls internally
+     (AgencyAlertsTable's .scrollWrap) if its content needs more room. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
   gap: var(--space-5);
   align-items: start;
 }

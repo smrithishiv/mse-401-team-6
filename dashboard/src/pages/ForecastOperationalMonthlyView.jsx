@@ -24,13 +24,13 @@ function MonthCard({ month, selected, onSelect }) {
         <span className={styles.monthLabel}>
           {month.label} · {isPredicted ? 'predicted' : 'actual'}
         </span>
-        {isPredicted && <ConfidenceBadge level={month.confidence} />}
+        {isPredicted && <ConfidenceBadge level={month.confidence} wrap />}
       </div>
       {month.subLabel && <span className={styles.subLabel}>{month.subLabel}</span>}
 
       <p className={styles.monthValue}>{formatNumber(month.value)}</p>
 
-      <ForecastStatusBadge statusKey={month.statusKey} />
+      <ForecastStatusBadge statusKey={month.statusKey} wrap />
 
       {month.range && (
         <p className={styles.rangeText}>
@@ -47,6 +47,12 @@ function MonthCard({ month, selected, onSelect }) {
 export default function ForecastOperationalMonthlyView({ data, selectedMonthId, onSelectMonth }) {
   const activeMonthId = selectedMonthId || data.defaultSelectedMonthId;
   const activeMonth = data.months.find((m) => m.id === activeMonthId);
+  const firstMonth = data.months[0];
+  const lastMonth = data.months[data.months.length - 1];
+  const chartTitle =
+    firstMonth && lastMonth && firstMonth !== lastMonth
+      ? `Demand forecast — ${firstMonth.label} to ${lastMonth.label}`
+      : 'Demand forecast';
 
   const { data: explanations, loading: explanationsLoading, error: explanationsError, retry } = useAsync(
     () => getDriverExplanations(activeMonthId),
@@ -74,7 +80,7 @@ export default function ForecastOperationalMonthlyView({ data, selectedMonthId, 
       )}
 
       <section className={`card ${styles.chartCard}`}>
-        <h2 className={styles.chartTitle}>Demand forecast — July to September 2026</h2>
+        <h2 className={styles.chartTitle}>{chartTitle}</h2>
         <ForecastChart
           historical={data.chart.historical}
           forecast={data.chart.forecast}

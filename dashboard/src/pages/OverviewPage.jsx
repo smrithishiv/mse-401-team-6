@@ -7,6 +7,8 @@ import ConfidenceBadge from '../components/ConfidenceBadge';
 import StatusBadge from '../components/StatusBadge';
 import InfoTooltip from '../components/InfoTooltip';
 import DataFreshness from '../components/DataFreshness';
+import ModelStatusNote from '../components/ModelStatusNote';
+import NoticeBanner from '../components/NoticeBanner';
 import OperationalSummary from '../components/OperationalSummary';
 import PopulationSignalBar from '../components/PopulationSignalBar';
 import AgencyAlertsTable from '../components/AgencyAlertsTable';
@@ -78,6 +80,13 @@ export default function OverviewPage() {
         <>
           <OperationalSummary items={data.operationalSummary} />
 
+          {data.summary.isSampleData && (
+            <NoticeBanner
+              tone="info"
+              text="Showing sample forecast data — the real Holt-Winters output file wasn't found. Run modeling/baselines/export_forecast.py, then reload."
+            />
+          )}
+
           <Link to="/forecast" className={`card ${styles.heroCard}`} aria-label="Predicted hamper demand — view forecast details">
             <p className={styles.heroLabel}>Predicted hamper demand — {data.summary.predictedDemand.monthLabel}</p>
             <div className={styles.heroRow}>
@@ -103,6 +112,7 @@ export default function OverviewPage() {
               <strong>{data.summary.predictedDemand.recommendationTitle}</strong>
               <p>{data.summary.predictedDemand.recommendationHelp}</p>
             </div>
+            <ModelStatusNote model={data.summary.model} status={data.summary.modelStatus} statusNote={data.summary.modelStatusNote} />
             <span className={styles.heroLink}>
               View forecast details <ArrowRight size={14} aria-hidden="true" />
             </span>

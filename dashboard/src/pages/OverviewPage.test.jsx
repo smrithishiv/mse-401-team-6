@@ -89,7 +89,7 @@ describe('OverviewPage', () => {
     renderApp();
     await screen.findByText('54,200 people', {}, { timeout: 3000 });
 
-    fireEvent.change(screen.getByLabelText('Reporting period'), { target: { value: 'jul-2026' } });
+    fireEvent.change(screen.getByLabelText('Reporting period'), { target: { value: 'previous' } });
 
     expect(await screen.findByText('51,840 people', {}, { timeout: 3000 })).toBeInTheDocument();
     expect(screen.getByText('Actual')).toBeInTheDocument();

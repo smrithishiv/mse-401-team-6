@@ -34,6 +34,13 @@ export const FORECAST_STATUS = {
     icon: 'AlertOctagon',
     tooltip: 'Demand is far outside the accepted threshold and requires immediate intervention.',
   },
+  'forecast-pending': {
+    label: 'Model forecast — thresholds not yet calibrated',
+    tone: 'grey',
+    icon: 'Info',
+    tooltip:
+      "This is the model's point forecast and prediction interval. On-track / manual-review thresholds have not been calibrated for this model yet, so no allocation judgement is implied.",
+  },
 };
 
 export function getForecastStatusInfo(statusKey) {
@@ -43,4 +50,6 @@ export function getForecastStatusInfo(statusKey) {
 export const CONFIDENCE_TOOLTIPS = {
   high: 'The forecast range is within ±5% of the predicted number and can generally be used without manual confirmation.',
   low: 'The range is wider than usual, typically because one or more inputs are projected rather than measured. Confirm allocation manually before distributing.',
+  pending:
+    'This forecast has a prediction interval, but high/low confidence thresholds have not been statistically calibrated yet. Treat this badge as a prototype, not a calibrated confidence level.',
 };

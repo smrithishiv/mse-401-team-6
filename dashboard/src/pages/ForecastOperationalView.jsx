@@ -1,5 +1,7 @@
 import SegmentedToggle from '../components/SegmentedToggle';
 import DataFreshness from '../components/DataFreshness';
+import ModelStatusNote from '../components/ModelStatusNote';
+import NoticeBanner from '../components/NoticeBanner';
 import ForecastOperationalMonthlyView from './ForecastOperationalMonthlyView';
 import ForecastOperationalWeeklyView from './ForecastOperationalWeeklyView';
 import styles from './ForecastOperationalView.module.css';
@@ -29,6 +31,21 @@ export default function ForecastOperationalView({
     <div className={styles.wrap}>
       {operationalStatus && (
         <DataFreshness dataUpdated={operationalStatus.dataThrough} modelLastRun={operationalStatus.generatedAt} />
+      )}
+      {granularity === 'monthly' && (
+        <ModelStatusNote model={data.model} status={data.modelStatus} statusNote={data.modelStatusNote} isSampleData={data.isSampleData} />
+      )}
+      {granularity === 'monthly' && data.isSampleData && (
+        <NoticeBanner
+          tone="info"
+          text="Showing sample forecast data — the real Holt-Winters output file wasn't found. Run modeling/baselines/export_forecast.py, then reload."
+        />
+      )}
+      {granularity === 'weekly' && (
+        <NoticeBanner
+          tone="info"
+          text="Weekly view is illustrative sample data — the Holt-Winters model forecasts monthly only, so this isn't real model output."
+        />
       )}
       <SegmentedToggle
         options={GRANULARITY_OPTIONS}

@@ -58,7 +58,7 @@ describe('ForecastPage', () => {
 
     expect(await screen.findByText(/Who.s driving the August 2026 number/, {}, { timeout: 3000 })).toBeInTheDocument();
 
-    const septCard = screen.getByText(/Sept 2026/).closest('[role="button"]');
+    const septCard = screen.getByText(/Sept 2026 · predicted/).closest('[role="button"]');
     fireEvent.click(septCard);
 
     expect(

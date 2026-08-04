@@ -2,6 +2,8 @@ import { mockRequest } from './api';
 import { operationalForecast, operationalForecastWeekly, strategicForecastByHorizon } from '../data/mockForecastData';
 import { driverExplanations, EMPTY_DRIVER_EXPLANATION } from '../data/mockDriverExplanations';
 import { modelStatus } from '../data/mockModelStatus';
+import { getRealForecast } from './realForecastData';
+import { buildOperationalForecast } from '../utils/realForecastAdapter';
 
 /**
  * Future backend integration:
@@ -9,7 +11,30 @@ import { modelStatus } from '../data/mockModelStatus';
  *     return apiFetch(`/api/forecast/operational/monthly${toQueryString(filters)}`);
  *   }
  * Same pattern applies to getOperationalForecastWeekly and getStrategicForecast below.
+ *
+ * getOperationalForecast (monthly) is the one function wired to the real
+ * Holt-Winters export today — see utils/realForecastAdapter.js. Weekly and
+ * strategic stay on mock data: the model doesn't forecast at weekly
+ * granularity or multi-year horizons, and fabricating either would violate
+ * the "don't invent what the model doesn't produce" rule this integration
+ * follows throughout.
  */
+
+/**
+ * Real Holt-Winters output if the export file is present and valid;
+ * otherwise the existing mock `operationalForecast`, tagged `isSampleData:
+ * true` so the UI can show it's not live model output. Never throws —
+ * callers always get a renderable shape.
+ */
+async function loadOperationalMonthly() {
+  try {
+    const exportData = await getRealForecast();
+    return buildOperationalForecast(exportData);
+  } catch (err) {
+    console.warn('[forecastService] Real forecast unavailable, falling back to sample data:', err.message);
+    return { ...operationalForecast, isSampleData: true };
+  }
+}
 
 const GENDER_SHARE = { male: 0.52, female: 0.4, other: 0.08 };
 
@@ -28,7 +53,8 @@ function scaleByFilters(value, filters) {
 }
 
 export async function getOperationalForecast(filters = {}) {
-  const data = await mockRequest(operationalForecast, { forceError: filters.forceError });
+  const real = await loadOperationalMonthly();
+  const data = await mockRequest(real, { forceError: filters.forceError });
   const factor = scaleByFilters(1, filters);
 
   if (factor === 1) return data;

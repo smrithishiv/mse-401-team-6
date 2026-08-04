@@ -119,7 +119,7 @@ export const atRiskFilterFields = [
 // ---------------------------------------------------------------------------
 
 export const overviewCompactFilterDefaults = {
-  period: 'aug-2026',
+  period: 'current',
 };
 
 export const overviewCompactFilterFields = [
